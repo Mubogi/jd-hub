@@ -1,0 +1,107 @@
+{% extends "hub/base.html" %}
+{% load static %}
+
+{% block title %}Contact — JD Hub{% endblock %}
+
+{% block content %}
+<section class="page-hero-jd">
+  <div class="container py-5 text-white">
+    <span class="badge bg-accent-soft text-accent mb-2 px-3 py-2 rounded-pill">Get in touch</span>
+    <h1 class="display-5 fw-extrabold mb-2">Let's build something together</h1>
+    <p class="lead text-white-50 mb-0">Send us a message and we'll route it to WhatsApp or email instantly.</p>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Form -->
+      <div class="col-lg-7" id="contact-form">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+          <h2 class="h4 fw-bold mb-1">Send an inquiry</h2>
+          <p class="text-muted small mb-4">Fields marked with * are required.</p>
+
+          {% if sent %}
+          <div class="alert alert-success d-flex align-items-center" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <div>Thank you — your message has been received. We'll respond shortly.</div>
+          </div>
+          {% endif %}
+
+          <form method="post" action="{% url 'contact' %}#contact-form" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="id_name">Full name *</label>
+                <input type="text" class="form-control" id="id_name" name="name" required placeholder="Jane Doe">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="id_email">Email *</label>
+                <input type="email" class="form-control" id="id_email" name="email" required placeholder="jane@example.com">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="id_phone">Phone</label>
+                <input type="tel" class="form-control" id="id_phone" name="phone" placeholder="+256 700 000 000">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="id_subject">Subject</label>
+                <select class="form-select" id="id_subject" name="subject">
+                  <option>General inquiry</option>
+                  <option>Systems / Software build</option>
+                  <option>Academy enrolment</option>
+                  <option>ICT infrastructure</option>
+                  <option>Media &amp; livestreaming</option>
+                  <option>Support</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="id_message">Message *</label>
+                <textarea class="form-control" id="id_message" name="message" rows="5" required placeholder="Tell us about your project, course interest, or question..."></textarea>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="id_via_whatsapp" name="via_whatsapp">
+                  <label class="form-check-label" for="id_via_whatsapp">
+                    Also send this message directly to WhatsApp (+{{ WHATSAPP_NUMBER }})
+                  </label>
+                </div>
+              </div>
+              <div class="col-12 d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-primary-jd rounded-pill px-4">
+                  <i class="fa-solid fa-paper-plane me-1"></i> Send message
+                </button>
+                <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" class="btn btn-success rounded-pill px-4">
+                  <i class="fa-brands fa-whatsapp me-1"></i> Chat on WhatsApp
+                </a>
+                <a href="mailto:{{ CONTACT_EMAIL }}" class="btn btn-outline-secondary rounded-pill px-4">
+                  <i class="fa-solid fa-envelope me-1"></i> Email us
+                </a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h3 class="h5 fw-bold"><i class="fa-brands fa-whatsapp text-success me-2"></i>WhatsApp direct</h3>
+          <p class="mb-0">+{{ WHATSAPP_NUMBER }}</p>
+          <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" class="btn btn-success rounded-pill mt-3">
+            Open WhatsApp <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i>
+          </a>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h3 class="h5 fw-bold"><i class="fa-solid fa-envelope text-primary me-2"></i>Email</h3>
+          <p class="mb-0">{{ CONTACT_EMAIL }}</p>
+          <a href="mailto:{{ CONTACT_EMAIL }}" class="btn btn-outline-primary-jd rounded-pill mt-3">Send email</a>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <h3 class="h5 fw-bold"><i class="fa-solid fa-location-dot text-danger me-2"></i>Location</h3>
+          <p class="mb-0">{{ SITE_ADDRESS }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

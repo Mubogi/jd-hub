@@ -1,0 +1,259 @@
+{% extends "hub/base.html" %}
+{% load static %}
+
+{% block title %}JD Hub: Innovation, Education &amp; Software Solutions{% endblock %}
+
+{% block content %}
+<!-- ===== Hero ===== -->
+<header class="hero-jd" id="top">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="container position-relative">
+    <div class="row align-items-center min-vh-100 py-5">
+      <div class="col-lg-7 text-white">
+        <span class="badge bg-accent-soft text-accent mb-3 px-3 py-2 rounded-pill">
+          <i class="fa-solid fa-bolt me-1"></i> {{ SITE_TAGLINE }}
+        </span>
+        <h1 class="display-3 fw-extrabold mb-3 hero-title">
+          JD Hub: <span class="text-gradient">Innovation, Education &amp; Software Solutions</span>
+        </h1>
+        <p class="lead mb-4 text-white-50 hero-sub">{{ HERO_SUBTITLE|default:"Innovation, education, and software solutions for schools, SACCOs, and institutions." }}</p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="#systems" class="btn btn-accent btn-lg rounded-pill px-4">
+            <i class="fa-solid fa-cube me-1"></i> Explore Systems
+          </a>
+          <a href="#academy" class="btn btn-outline-light btn-lg rounded-pill px-4">
+            <i class="fa-solid fa-graduation-cap me-1"></i> Join Academy
+          </a>
+        </div>
+        <div class="hero-stats mt-5 d-flex flex-wrap gap-4">
+          <div><span class="stat-num">3+</span><span class="stat-label">Flagship Systems</span></div>
+          <div><span class="stat-num">5+</span><span class="stat-label">Academy Courses</span></div>
+          <div><span class="stat-num">100%</span><span class="stat-label">Offline-Ready</span></div>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="hero-card-stack">
+          <div class="hero-card float-card">
+            <div class="d-flex align-items-center gap-3">
+              <span class="hero-card-icon bg-primary-soft"><i class="fa-solid fa-school"></i></span>
+              <div>
+                <div class="fw-bold text-white">School Management</div>
+                <small class="text-white-50">Offline-first PWA</small>
+              </div>
+            </div>
+          </div>
+          <div class="hero-card float-card" style="animation-delay:.6s">
+            <div class="d-flex align-items-center gap-3">
+              <span class="hero-card-icon bg-accent-soft"><i class="fa-solid fa-hand-holding-dollar"></i></span>
+              <div>
+                <div class="fw-bold text-white">SACCO &amp; Microfinance</div>
+                <small class="text-white-50">Double-entry ledger</small>
+              </div>
+            </div>
+          </div>
+          <div class="hero-card float-card" style="animation-delay:1.2s">
+            <div class="d-flex align-items-center gap-3">
+              <span class="hero-card-icon bg-info-soft"><i class="fa-solid fa-database"></i></span>
+              <div>
+                <div class="fw-bold text-white">Destiny College DBMS</div>
+                <small class="text-white-50">Academic analytics</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a href="#systems" class="hero-scroll" aria-label="Scroll down"><i class="fa-solid fa-chevron-down"></i></a>
+  </div>
+</header>
+
+<!-- ===== Systems Showcase ===== -->
+<section id="systems" class="section-jd">
+  <div class="container">
+    <div class="text-center section-head mx-auto">
+      <span class="eyebrow">Flagship Systems</span>
+      <h2 class="section-title">Software that works where you are</h2>
+      <p class="section-sub">Production-grade, offline-first systems for education, finance, and data management — each with a downloadable technical whitepaper.</p>
+    </div>
+    <div class="row g-4 mt-2">
+      {% for system in systems %}
+      <div class="col-md-6 col-lg-4">
+        <article class="card system-card h-100">
+          <div class="system-card-glow"></div>
+          <div class="card-body d-flex flex-column p-4">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <span class="system-icon"><i class="{{ system.icon }}"></i></span>
+              <span class="badge bg-soft-{{ system.category }} text-{{ system.category }} rounded-pill text-uppercase">{{ system.get_category_display }}</span>
+            </div>
+            <h3 class="h5 fw-bold mb-1">{{ system.title }}</h3>
+            <p class="text-muted small mb-3">{{ system.tagline }}</p>
+            <p class="card-text small flex-grow-1">{{ system.description|truncatewords:28 }}</p>
+            {% if system.feature_list %}
+            <ul class="system-features small mb-3">
+              {% for f in system.feature_list|slice:":4" %}
+              <li><i class="fa-solid fa-check"></i> {{ f }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if system.tech_list %}
+            <div class="tech-chips mb-3">
+              {% for t in system.tech_list %}
+              <span class="tech-chip">{{ t }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="d-grid gap-2 mt-auto">
+              <a href="{% url 'system_pdf' system.slug %}" class="btn btn-primary-jd rounded-pill" download>
+                <i class="fa-solid fa-file-pdf me-1"></i> Download Documentation PDF
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center text-muted py-5">No systems published yet. Add some in the admin.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ===== Academy ===== -->
+<section id="academy" class="section-jd section-alt">
+  <div class="container">
+    <div class="text-center section-head mx-auto">
+      <span class="eyebrow">Academy &amp; Tutoring Hub</span>
+      <h2 class="section-title">Adult education &amp; practical skills</h2>
+      <p class="section-sub">{{ site.academy_intro|default:"Hands-on courses for adult learners and students." }}</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar mb-4" id="courseFilters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="stem"><i class="fa-solid fa-flask me-1"></i> STEM</button>
+      <button class="filter-btn" data-filter="software"><i class="fa-solid fa-code me-1"></i> Software</button>
+      <button class="filter-btn" data-filter="financials"><i class="fa-solid fa-chart-line me-1"></i> Financials</button>
+    </div>
+
+    <div class="row g-4" id="courseGrid">
+      {% for course in courses %}
+      <div class="col-md-6 col-lg-4 course-item" data-category="{{ course.category }}">
+        <article class="card course-card h-100">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="course-icon bg-soft-{{ course.category }}"><i class="{{ course.icon }}"></i></span>
+              {% if course.level %}<span class="badge bg-light text-dark rounded-pill">{{ course.level }}</span>{% endif %}
+            </div>
+            <h3 class="h5 fw-bold mb-1">{{ course.title }}</h3>
+            {% if course.duration %}<p class="text-muted small mb-2"><i class="fa-regular fa-clock me-1"></i>{{ course.duration }}</p>{% endif %}
+            <p class="card-text small">{{ course.description|truncatewords:22 }}</p>
+            {% if course.curriculum_list %}
+            <details class="course-details">
+              <summary class="small fw-semibold">Curriculum highlights</summary>
+              <ul class="small mt-2 mb-0 ps-3">
+                {% for t in course.curriculum_list %}<li>{{ t }}</li>{% endfor %}
+              </ul>
+            </details>
+            {% endif %}
+          </div>
+          <div class="card-footer bg-transparent border-0 p-4 pt-0">
+            <a href="{% url 'contact' %}?subject=Academy: {{ course.title }}" class="btn btn-sm btn-outline-primary-jd rounded-pill w-100">
+              Enquire / Enrol <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </article>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center text-muted py-5">No courses published yet.</div>
+      {% endfor %}
+    </div>
+    <p class="text-center text-muted small mt-3" id="courseEmpty" style="display:none;">No courses in this category.</p>
+  </div>
+</section>
+
+<!-- ===== Services ===== -->
+<section id="services" class="section-jd">
+  <div class="container">
+    <div class="text-center section-head mx-auto">
+      <span class="eyebrow">Services &amp; Consultancy</span>
+      <h2 class="section-title">From idea to deployed solution</h2>
+      <p class="section-sub">{{ site.services_intro|default:"Custom software, ICT infrastructure, and media production — delivered end to end." }}</p>
+    </div>
+    <div class="row g-4">
+      {% for service in services %}
+      <div class="col-lg-4">
+        <div class="service-card h-100">
+          <div class="service-icon mb-3"><i class="{{ service.icon }}"></i></div>
+          <h3 class="h5 fw-bold">{{ service.title }}</h3>
+          <p class="text-muted small">{{ service.description }}</p>
+          {% if service.deliverable_list %}
+          <ul class="service-list small">
+            {% for d in service.deliverable_list %}<li>{{ d }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center text-muted py-5">No services published yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ===== Gallery ===== -->
+<section id="gallery" class="section-jd section-alt">
+  <div class="container">
+    <div class="text-center section-head mx-auto">
+      <span class="eyebrow">Design &amp; Media Gallery</span>
+      <h2 class="section-title">A look at our work</h2>
+      <p class="section-sub">{{ site.gallery_intro|default:"Posters, design portfolios, and OBS/YouTube video embeds." }}</p>
+    </div>
+    <div class="row g-3 gallery-grid">
+      {% for item in media_items %}
+      <div class="col-sm-6 col-lg-4">
+        <figure class="gallery-item" data-type="{{ item.media_type }}">
+          {% if item.media_type == "video" and item.youtube_embed_url %}
+          <div class="ratio ratio-16x9 gallery-media">
+            <iframe src="{{ item.youtube_embed_url }}" title="{{ item.title }}" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          </div>
+          {% elif item.image %}
+          <img src="{{ item.image.url }}" class="gallery-media" alt="{{ item.title }}" loading="lazy">
+          {% else %}
+          <div class="gallery-media gallery-placeholder d-flex align-items-center justify-content-center">
+            <i class="fa-solid fa-image fa-2x text-muted"></i>
+          </div>
+          {% endif %}
+          <figcaption class="gallery-caption">
+            <strong>{{ item.title }}</strong>
+            {% if item.caption %}<span class="d-block small text-white-50">{{ item.caption }}</span>{% endif %}
+          </figcaption>
+        </figure>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center text-muted py-5">No media published yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA band ===== -->
+<section class="cta-band py-5">
+  <div class="container">
+    <div class="row align-items-center text-white">
+      <div class="col-lg-8">
+        <h2 class="h3 fw-bold mb-1">Ready to build, learn, or deploy?</h2>
+        <p class="mb-0 text-white-50">Talk to {{ SITE_OWNER }} about systems, the academy, or consultancy — direct to WhatsApp or email.</p>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+        <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" class="btn btn-accent btn-lg rounded-pill me-2">
+          <i class="fa-brands fa-whatsapp me-1"></i> WhatsApp
+        </a>
+        <a href="{% url 'contact' %}" class="btn btn-outline-light btn-lg rounded-pill">Contact</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'hub/js/courses.js' %}"></script>
+{% endblock %}
