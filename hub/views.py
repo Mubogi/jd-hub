@@ -32,6 +32,12 @@ def home(request):
 @require_http_methods(["GET", "POST"])
 def contact(request):
     if request.method == "POST":
+        # Honeypot anti-spam: a hidden field bots tend to fill in. Real users
+        # never see it, so a non-empty value means "discard silently".
+        if request.POST.get("company_url"):
+            # Pretend success to bots; store nothing.
+            return redirect(f"{reverse('contact')}?sent=1#contact-form")
+
         name = (request.POST.get("name") or "").strip()
         email = (request.POST.get("email") or "").strip()
         phone = (request.POST.get("phone") or "").strip()

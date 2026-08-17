@@ -31,6 +31,10 @@
           <form method="post" action="{% url 'contact' %}#contact-form" novalidate>
             {% csrf_token %}
             <div class="row g-3">
+              <!-- Honeypot anti-spam: visually hidden + aria-hidden. Leave empty. -->
+              <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+                <label>Do not fill this field<input type="text" name="company_url" tabindex="-1" autocomplete="off"></label>
+              </div>
               <div class="col-md-6">
                 <label class="form-label" for="id_name">Full name *</label>
                 <input type="text" class="form-control" id="id_name" name="name" required placeholder="Jane Doe">

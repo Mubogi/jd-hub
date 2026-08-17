@@ -1,0 +1,39 @@
+# Render Blueprint for JD Hub (free-tier web service + free PostgreSQL).
+# Deploy via: New > Blueprint > connect this repo.
+# Render will create the web service and database defined below.
+# After the first deploy, set DJANGO_SECRET_KEY and an admin password as
+# environment variables (see README → Deploying to Render).
+preDeploy: "./build.sh"
+services:
+  - type: web
+    name: jd-hub
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn jdhub.wsgi:application --log-file -
+    healthCheckPath: /
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: PYTHON_VERSION
+        value: "3.13.4"
+      # Generate a strong key and paste it in Render's dashboard (secret).
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: DJANGO_WHATSAPP_NUMBER
+        value: "256700000000"
+      - key: DJANGO_CONTACT_EMAIL
+        value: "info@jdhub.example"
+      - key: WEB_CONCURRENCY
+        value: "2"
+      # Auto-linked to the database below.
+      - fromDatabase:
+          name: jd-hub-db
+          property: connectionString
+        key: DATABASE_URL
+
+databases:
+  - name: jd-hub-db
+    plan: free
+    ipAllowList: []
