@@ -15,8 +15,9 @@ db.sqlite3-journal
 staticfiles/
 # Keep the directory but not generated PDFs (they're rebuilt on deploy/first access)
 media/system_docs/*.pdf
-media/gallery/*
-!media/gallery/.gitkeep
+media/lesson_docs/*.pdf
+# Allow committed gallery + screenshot images (needed on deploy).
+# Only generated PDFs above are ignored.
 
 # Environment / secrets
 .env

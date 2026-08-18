@@ -14,6 +14,7 @@ from django.views.decorators.http import require_http_methods
 
 from hub.models import ContactSubmission, Course, Enrolment, MediaItem, Service, SiteSettings, System
 from hub.pdf import build_pdf
+from hub.lesson_pdf import TRACKS, build_lesson_pdf
 
 
 def home(request):
@@ -167,6 +168,34 @@ def system_pdf(request, slug: str):
         content_type="application/pdf",
     )
     response["Content-Disposition"] = f'attachment; filename="{system.slug}-whitepaper.pdf"'
+    response["Content-Length"] = str(pdf_path.stat().st_size)
+    return response
+
+
+def course_lessons_pdf(request, slug: str, track: str):
+    """Generate and stream a lesson-outline PDF for a course + track (cached on disk)."""
+    if track not in TRACKS:
+        raise Http404("Unknown lesson track.")
+    try:
+        course = Course.objects.get(slug=slug, is_published=True)
+    except Course.DoesNotExist:
+        raise Http404("Course not found.")
+
+    out_dir = settings.MEDIA_ROOT / "lesson_docs"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    pdf_path = out_dir / f"{course.slug}-{track}.pdf"
+
+    regenerate = (not pdf_path.exists()) or (
+        pdf_path.stat().st_mtime < course.updated_at.timestamp()
+    )
+    if regenerate:
+        build_lesson_pdf(course, track, pdf_path)
+
+    if not pdf_path.exists():
+        raise Http404("Lesson PDF could not be generated.")
+
+    response = FileResponse(open(pdf_path, "rb"), content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="{course.slug}-{track}-lessons.pdf"'
     response["Content-Length"] = str(pdf_path.stat().st_size)
     return response
 

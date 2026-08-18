@@ -26,8 +26,8 @@
           </a>
         </div>
         <div class="hero-stats mt-5 d-flex flex-wrap gap-4">
-          <div><span class="stat-num">6+</span><span class="stat-label">Services</span></div>
-          <div><span class="stat-num">5+</span><span class="stat-label">Academy Courses</span></div>
+          <div><span class="stat-num">4</span><span class="stat-label">Flagship Systems</span></div>
+          <div><span class="stat-num">12</span><span class="stat-label">Academy Courses</span></div>
           <div><span class="stat-num">100%</span><span class="stat-label">Online &amp; Offline</span></div>
         </div>
       </div>
@@ -185,6 +185,15 @@
             <a href="{% url 'enrol' %}" class="btn btn-sm btn-outline-primary-jd rounded-pill w-100">
               Enrol <i class="fa-solid fa-arrow-right ms-1"></i>
             </a>
+            <details class="lesson-pdfs mt-2">
+              <summary class="small fw-semibold text-muted">Lesson outline PDFs</summary>
+              <div class="d-flex flex-wrap gap-1 mt-2">
+                <a href="{% url 'course_lessons_pdf' course.slug 'beginner' %}" class="badge bg-soft-software text-software rounded-pill text-decoration-none" download>Beginner (2wk)</a>
+                <a href="{% url 'course_lessons_pdf' course.slug 'intermediate' %}" class="badge bg-soft-software text-software rounded-pill text-decoration-none" download>Intermediate (2wk)</a>
+                <a href="{% url 'course_lessons_pdf' course.slug 'advanced' %}" class="badge bg-soft-software text-software rounded-pill text-decoration-none" download>Advanced (2wk)</a>
+                <a href="{% url 'course_lessons_pdf' course.slug 'holiday' %}" class="badge bg-soft-stem text-stem rounded-pill text-decoration-none" download>Holiday Tutoring</a>
+              </div>
+            </details>
           </div>
         </article>
       </div>

@@ -16,6 +16,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import (
     HRFlowable,
+    Image,
     Paragraph,
     SimpleDocTemplate,
     Spacer,
@@ -26,12 +27,13 @@ from reportlab.platypus.flowables import KeepTogether
 
 from hub.models import System
 
-# Brand palette (kept in sync with the site CSS).
-BRAND_PRIMARY = colors.HexColor("#0d6efd")
-BRAND_DARK = colors.HexColor("#0b1f3a")
-BRAND_ACCENT = colors.HexColor("#14b8a6")
-BRAND_LIGHT = colors.HexColor("#f5f7fb")
+# Brand palette — red + gold on white (Jordan Design Hub theme).
+BRAND_PRIMARY = colors.HexColor("#C8102E")   # JD red
+BRAND_DARK = colors.HexColor("#8B0000")       # deep red
+BRAND_ACCENT = colors.HexColor("#D4AF37")     # gold
+BRAND_LIGHT = colors.HexColor("#FBF7F0")      # warm white tint
 BRAND_MUTED = colors.HexColor("#5b6b7b")
+BRAND_GOLD_DARK = colors.HexColor("#9B7B2E")  # darker gold for text
 
 
 def _styles() -> dict:
@@ -43,7 +45,7 @@ def _styles() -> dict:
         ),
         "subtitle": ParagraphStyle(
             "Subtitle", parent=base["Normal"], fontName="Helvetica",
-            fontSize=12, leading=16, textColor=BRAND_MUTED, spaceAfter=10,
+            fontSize=12, leading=16, textColor=BRAND_GOLD_DARK, spaceAfter=10,
         ),
         "h2": ParagraphStyle(
             "H2", parent=base["Heading2"], fontName="Helvetica-Bold",
@@ -52,12 +54,17 @@ def _styles() -> dict:
         ),
         "body": ParagraphStyle(
             "Body", parent=base["BodyText"], fontName="Helvetica",
-            fontSize=10.5, leading=15, textColor=BRAND_DARK, spaceAfter=6,
+            fontSize=10.5, leading=15, textColor=colors.HexColor("#1a1a1a"), spaceAfter=6,
         ),
         "bullet": ParagraphStyle(
             "Bullet", parent=base["BodyText"], fontName="Helvetica",
-            fontSize=10.5, leading=15, textColor=BRAND_DARK,
+            fontSize=10.5, leading=15, textColor=colors.HexColor("#1a1a1a"),
             leftIndent=14, bulletIndent=2, spaceAfter=2,
+        ),
+        "caption": ParagraphStyle(
+            "Caption", parent=base["Normal"], fontName="Helvetica-Oblique",
+            fontSize=9, leading=12, textColor=BRAND_GOLD_DARK,
+            alignment=1, spaceBefore=3, spaceAfter=10,
         ),
         "footer": ParagraphStyle(
             "Footer", parent=base["Normal"], fontName="Helvetica-Oblique",
@@ -77,8 +84,8 @@ def _styles() -> dict:
 def _header_footer(canvas, doc):
     canvas.saveState()
     width, height = A4
-    # Header band.
-    canvas.setFillColor(BRAND_DARK)
+    # Header band — JD red with gold accent.
+    canvas.setFillColor(BRAND_PRIMARY)
     canvas.rect(0, height - 18 * mm, width, 18 * mm, fill=1, stroke=0)
     canvas.setFillColor(colors.white)
     canvas.setFont("Helvetica-Bold", 12)
@@ -86,19 +93,75 @@ def _header_footer(canvas, doc):
     canvas.setFont("Helvetica", 9)
     canvas.setFillColor(BRAND_ACCENT)
     canvas.drawRightString(width - 20 * mm, height - 11 * mm, "Jordan Design Hub")
+    # Gold rule under header.
+    canvas.setStrokeColor(BRAND_ACCENT)
+    canvas.setLineWidth(1.2)
+    canvas.line(0, height - 18 * mm, width, height - 18 * mm)
     # Footer.
     canvas.setStrokeColor(BRAND_MUTED)
     canvas.setLineWidth(0.5)
     canvas.line(20 * mm, 14 * mm, width - 20 * mm, 14 * mm)
     canvas.setFillColor(BRAND_MUTED)
     canvas.setFont("Helvetica-Oblique", 8)
-    canvas.drawString(20 * mm, 9 * mm, "Confidential — Technical Whitepaper")
+    canvas.drawString(20 * mm, 9 * mm, "Jordan Design Hub — Technical Whitepaper")
     canvas.drawRightString(width - 20 * mm, 9 * mm, f"Page {doc.page}")
     canvas.restoreState()
 
 
 def _bullets(items: list[str], style) -> list:
     return [Paragraph(f"• {item}", style) for item in items]
+
+
+def _screenshot_block(shot_items: list[tuple[str, str]], s: dict) -> list:
+    """Build flowables for screenshots: two per row, scaled to fit, with captions."""
+    from pathlib import Path as _Path
+
+    media_root = _Path(settings.MEDIA_ROOT)
+    page_width = A4[0] - 40 * mm  # minus margins
+    col_width = (page_width - 6 * mm) / 2
+    max_img_h = 70 * mm
+    flowables: list = []
+    pairs = [shot_items[i : i + 2] for i in range(0, len(shot_items), 2)]
+    for pair in pairs:
+        cells = []
+        for rel_path, caption in pair:
+            img_path = media_root / rel_path
+            if not img_path.exists():
+                cells.append(Paragraph(f"<i>Image not found: {rel_path}</i>", s["caption"]))
+                continue
+            try:
+                from PIL import Image as PILImage
+
+                with PILImage.open(img_path) as im:
+                    iw, ih = im.size
+                ratio = iw / ih
+                draw_w = col_width
+                draw_h = draw_w / ratio
+                if draw_h > max_img_h:
+                    draw_h = max_img_h
+                    draw_w = draw_h * ratio
+                img = Image(str(img_path), width=draw_w, height=draw_h)
+                cell = [img]
+                if caption:
+                    cell.append(Paragraph(caption, s["caption"]))
+                cells.append(cell)
+            except Exception:
+                cells.append(Paragraph(f"<i>Unable to render: {rel_path}</i>", s["caption"]))
+        # Pad to 2 columns.
+        while len(cells) < 2:
+            cells.append([Spacer(1, 1)])
+        table = Table([[cells[0], cells[1]]], colWidths=[col_width, col_width])
+        table.setStyle(TableStyle([
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 2),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 2),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ]))
+        flowables.append(KeepTogether(table))
+        flowables.append(Spacer(1, 3 * mm))
+    return flowables
 
 
 def _meta_table(system: System, s: dict) -> Table:
@@ -158,20 +221,26 @@ def build_pdf(system: System, output_path: Path | None = None) -> Path:
         story.append(Paragraph("2. Key Features", s["h2"]))
         story.extend(_bullets(system.feature_list, s["bullet"]))
 
+    # Screenshots — real product images.
+    shot_items = system.screenshot_list
+    if shot_items:
+        story.append(Paragraph("3. Screenshots", s["h2"]))
+        story.extend(_screenshot_block(shot_items, s))
+
     # Architecture (generic, tailored per category).
-    story.append(Paragraph("3. System Architecture", s["h2"]))
+    story.append(Paragraph("4. System Architecture", s["h2"]))
     story.append(Paragraph(_architecture_text(system), s["body"]))
 
     # Offline sync.
-    story.append(Paragraph("4. Offline-First & Sync Strategy", s["h2"]))
+    story.append(Paragraph("5. Offline-First & Sync Strategy", s["h2"]))
     story.append(Paragraph(_offline_text(system), s["body"]))
 
     # Database capabilities.
-    story.append(Paragraph("5. Database Capabilities", s["h2"]))
+    story.append(Paragraph("6. Database Capabilities", s["h2"]))
     story.append(Paragraph(_database_text(system), s["body"]))
 
     # Security & deployment.
-    story.append(Paragraph("6. Security & Deployment", s["h2"]))
+    story.append(Paragraph("7. Security & Deployment", s["h2"]))
     story.extend(_bullets(_security_points(system), s["bullet"]))
 
     # Call to action.

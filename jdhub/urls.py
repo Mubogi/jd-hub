@@ -20,6 +20,7 @@ urlpatterns = [
     path("enrol/", views.enrol, name="enrol"),
     path("contact/", views.contact, name="contact"),
     path("systems/<slug:slug>/pdf/", views.system_pdf, name="system_pdf"),
+    path("courses/<slug:slug>/lessons/<str:track>/pdf/", views.course_lessons_pdf, name="course_lessons_pdf"),
     path("robots.txt", views.robots, name="robots"),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
 ]

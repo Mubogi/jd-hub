@@ -39,6 +39,10 @@ class System(models.Model):
         blank=True,
         help_text="Comma-separated, e.g. 'Django, PWA, SQLite, Bootstrap'.",
     )
+    screenshots = models.TextField(
+        blank=True,
+        help_text="One screenshot per line as 'path|caption'. Paths are relative to MEDIA_ROOT.",
+    )
     sort_order = models.PositiveIntegerField(default=0)
     is_published = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -64,6 +68,20 @@ class System(models.Model):
     @property
     def tech_list(self) -> list[str]:
         return [t.strip() for t in self.tech_stack.split(",") if t.strip()]
+
+    @property
+    def screenshot_list(self) -> list[tuple[str, str]]:
+        """Return list of (relative_path, caption) tuples."""
+        result = []
+        for line in self.screenshots.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split("|", 1)
+            path = parts[0].strip()
+            caption = parts[1].strip() if len(parts) > 1 else ""
+            result.append((path, caption))
+        return result
 
 
 class Course(models.Model):

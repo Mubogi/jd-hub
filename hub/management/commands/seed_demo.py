@@ -14,25 +14,69 @@ from hub.pdf import build_pdf
 SYSTEMS = [
     {
         "title": "Offline-First School Management System",
-        "tagline": "PWA/Django platform for schools — runs even without the internet.",
+        "tagline": "Desktop + web platform for schools — runs even without the internet.",
         "category": "education",
         "icon": "fa-solid fa-school",
-        "tech_stack": "Django, PWA, SQLite, PostgreSQL, Bootstrap, Service Worker",
+        "tech_stack": "Django, PWA, SQLite, PostgreSQL, Bootstrap, Service Worker, PyInstaller",
         "description": (
-            "A progressive web app built on Django that digitises the full school workflow — "
-            "enrolment, attendance, grading, fee collection, and parent communication. Its "
-            "offline-first architecture ensures teachers in low-connectivity areas keep working, "
-            "with automatic synchronisation when the network returns."
+            "A desktop application (with PWA companion) built on Django that digitises the full "
+            "school workflow — enrolment, attendance, grading, fee collection, and parent "
+            "communication. Its offline-first architecture ensures teachers in low-connectivity "
+            "areas keep working, with automatic synchronisation when the network returns. "
+            "Hardware-bound licensing protects against unauthorised copying."
         ),
         "features": [
             "Student & staff records with role-based dashboards",
             "Attendance and assessment capture (offline-capable)",
             "Fee billing, receipts, and arrears tracking",
-            "Parent portal with SMS/email notifications",
+            "Parent portal with WhatsApp/email notifications at no cost",
             "Termly report cards and transcript generation",
-            "Backup and restore to CSV/Excel",
+            "QR parent kiosk for report access",
+            "Hybrid backup (local, USB, cloud)",
+        ],
+        "screenshots": [
+            ("system_shots/sms_landing_page.png", "Landing page — branded entry point"),
+            ("system_shots/sms_admin_dashboard.png", "School admin dashboard"),
+            ("system_shots/sms_student_list.png", "Student management list"),
+            ("system_shots/sms_student_enroll.png", "Student enrolment form"),
+            ("system_shots/sms_marks_entry.png", "Bulk marks entry"),
+            ("system_shots/sms_receipts.png", "Fee receipts and payments"),
+            ("system_shots/sms_whatsapp_queue.png", "WhatsApp notification queue"),
+            ("system_shots/sms_parent_kiosk.png", "QR parent kiosk"),
         ],
         "sort_order": 10,
+    },
+    {
+        "title": "Attendance Hub",
+        "tagline": "Event & church attendance kiosk — desktop, web, and native Android.",
+        "category": "education",
+        "icon": "fa-solid fa-clipboard-check",
+        "tech_stack": "Django, SQLite, Room (Android), Kotlin, PWA, Excel/CSV export",
+        "description": (
+            "A standalone attendance system for churches, conferences, and events — available as "
+            "a Windows desktop app, a web kiosk, and a fully native Android app. No server, no "
+            "computer, no internet required: everything runs on the device. The Android edition "
+            "adds Wi-Fi device linking so multiple phones share one attendance dataset in real time."
+        ),
+        "features": [
+            "One-tap check-in and quick member registration",
+            "Searchable member database with attendance history",
+            "Session-based attendance (services, conferences, workshops)",
+            "Sunday school / children & dependent tracking",
+            "Excel, CSV, and PDF report exports",
+            "JSON backup export and restore",
+            "Wi-Fi device linking (Android) — multi-phone shared dataset",
+            "Works fully offline — on-device SQLite database",
+        ],
+        "screenshots": [
+            ("system_shots/attendance_web_dashboard.png", "Registration dashboard — live counts & quick check-in"),
+            ("system_shots/attendance_web_members.png", "Members database with filters"),
+            ("system_shots/attendance_web_reports.png", "Reports — session summary, missed lists, exports"),
+            ("system_shots/attendance_web_admin.png", "Admin dashboard — backup & reset"),
+            ("system_shots/attendance_web_member_profile.png", "Member profile with attendance history"),
+            ("system_shots/attendance_web_device_link.png", "Wi-Fi device linking — host & join sessions"),
+        ],
+        "sort_order": 15,
     },
     {
         "title": "SACCO Portfolio Quality & Microfinance System",
@@ -189,6 +233,131 @@ COURSES = [
         ],
         "sort_order": 60,
     },
+    {
+        "title": "Microsoft Word",
+        "category": "software",
+        "icon": "fa-solid fa-file-word",
+        "level": "Beginner to Intermediate",
+        "duration": "2 weeks",
+        "description": (
+            "Master Microsoft Word — from formatting a simple letter to designing professional "
+            "reports, CVs, and certificates. Learn single-tool mastery of the world's most-used "
+            "word processor."
+        ),
+        "curriculum": [
+            "Interface, ribbons, and document setup",
+            "Text formatting, styles, and themes",
+            "Tables, images, and page layout",
+            "Headers, footers, and section breaks",
+            "Mail merge, references, and table of contents",
+            "Templates, review tools, and PDF export",
+        ],
+        "sort_order": 70,
+    },
+    {
+        "title": "Microsoft Excel",
+        "category": "software",
+        "icon": "fa-solid fa-file-excel",
+        "level": "Beginner to Advanced",
+        "duration": "2 weeks",
+        "description": (
+            "Learn Microsoft Excel end-to-end — from entering data and basic formulas to building "
+            "dashboards, pivot tables, and automation. The single most valuable office tool for "
+            "data-driven work."
+        ),
+        "curriculum": [
+            "Workbook, worksheets, and data entry",
+            "Formatting, sorting, and filtering",
+            "Formulas: SUM, IF, VLOOKUP, COUNTIF, SUMIF",
+            "Charts and conditional formatting",
+            "Pivot tables and pivot charts",
+            "Data validation, protection, and dashboards",
+            "Macros and automation basics",
+        ],
+        "sort_order": 80,
+    },
+    {
+        "title": "Microsoft PowerPoint",
+        "category": "software",
+        "icon": "fa-solid fa-file-powerpoint",
+        "level": "Beginner to Intermediate",
+        "duration": "2 weeks",
+        "description": (
+            "Create compelling presentations with Microsoft PowerPoint — slides, transitions, "
+            "animations, and professional design. Perfect for students, teachers, and business "
+            "presenters."
+        ),
+        "curriculum": [
+            "Slide master, layouts, and themes",
+            "Text, shapes, and SmartArt",
+            "Images, charts, and multimedia",
+            "Transitions and animations",
+            "Presenter tools and rehearsal",
+            "Export to video and PDF",
+        ],
+        "sort_order": 90,
+    },
+    {
+        "title": "Microsoft Access",
+        "category": "software",
+        "icon": "fa-solid fa-database",
+        "level": "Intermediate to Advanced",
+        "duration": "2 weeks",
+        "description": (
+            "Learn database design with Microsoft Access — tables, queries, forms, and reports. "
+            "Build a working database application from scratch."
+        ),
+        "curriculum": [
+            "Database concepts and table design",
+            "Relationships and referential integrity",
+            "Select, parameter, and action queries",
+            "Forms for data entry and navigation",
+            "Reports and grouping",
+            "Macros and a simple navigation system",
+        ],
+        "sort_order": 100,
+    },
+    {
+        "title": "Microsoft Word + Excel Combo",
+        "category": "software",
+        "icon": "fa-solid fa-file-lines",
+        "level": "Beginner to Intermediate",
+        "duration": "2 weeks",
+        "description": (
+            "Learn two Microsoft Office tools at once — Word and Excel. The ideal pair for office "
+            "staff, administrators, and students who need documents and spreadsheets together."
+        ),
+        "curriculum": [
+            "Word: formatting, styles, and professional documents",
+            "Word: tables, images, and mail merge",
+            "Excel: data entry, formulas, and formatting",
+            "Excel: VLOOKUP, charts, and pivot tables",
+            "Linking Excel data into Word documents",
+            "Mini-project: report with embedded spreadsheet",
+        ],
+        "sort_order": 110,
+    },
+    {
+        "title": "Microsoft Office Suite (All Tools)",
+        "category": "software",
+        "icon": "fa-solid fa-window-restore",
+        "level": "Beginner to Advanced",
+        "duration": "4 weeks",
+        "description": (
+            "Learn the full Microsoft Office Suite — Word, Excel, PowerPoint, Access, and Outlook. "
+            "A complete office productivity programme for students, job-seekers, and professionals."
+        ),
+        "curriculum": [
+            "Word: documents, mail merge, and templates",
+            "Excel: formulas, pivot tables, and dashboards",
+            "PowerPoint: design, animation, and delivery",
+            "Access: databases, queries, and reports",
+            "Outlook: email, calendar, and contacts",
+            "Integration: linking Office tools together",
+            "Capstone project across the full suite",
+        ],
+        "sort_order": 120,
+    },
 ]
 
 SERVICES = [
@@ -301,7 +470,78 @@ SERVICES = [
 
 # Media gallery is intentionally empty for now — the user will add real
 # portfolio items (posters, videos, screenshots) via the admin later.
-MEDIA_ITEMS = []
+MEDIA_ITEMS = [
+    {
+        "title": "Jordan Design Hub — Brand",
+        "caption": "Software • Academy • Tutoring — Uganda's tech ecosystem.",
+        "media_type": "image",
+        "image": "gallery/brand-square.png",
+        "sort_order": 10,
+    },
+    {
+        "title": "School Management System",
+        "caption": "Offline-first school platform — students, fees, marks, reports.",
+        "media_type": "image",
+        "image": "gallery/school-system-square.png",
+        "sort_order": 20,
+    },
+    {
+        "title": "Attendance Hub",
+        "caption": "Church & event attendance — phone, web & desktop.",
+        "media_type": "image",
+        "image": "gallery/attendance-hub-square.png",
+        "sort_order": 30,
+    },
+    {
+        "title": "Microsoft Office Courses",
+        "caption": "Word, Excel, PowerPoint, Access & Outlook — one tool or the full suite.",
+        "media_type": "image",
+        "image": "gallery/microsoft-office-square.png",
+        "sort_order": 40,
+    },
+    {
+        "title": "Excel Mastery",
+        "caption": "From formulas to dashboards & automation.",
+        "media_type": "image",
+        "image": "gallery/microsoft-excel-square.png",
+        "sort_order": 50,
+    },
+    {
+        "title": "Coding & STEM for Kids",
+        "caption": "Scratch, robotics & practical science — Uganda & Cambridge curricula.",
+        "media_type": "image",
+        "image": "gallery/coding-stem-square.png",
+        "sort_order": 60,
+    },
+    {
+        "title": "Holiday Tutoring Programme",
+        "caption": "Learn. Build. Showcase. — with a certificate on completion.",
+        "media_type": "image",
+        "image": "gallery/holiday-tutoring-square.png",
+        "sort_order": 70,
+    },
+    {
+        "title": "Online Tutoring via Google Meet",
+        "caption": "Learn from anywhere — MoMo / Airtel payment.",
+        "media_type": "image",
+        "image": "gallery/online-tutoring-square.png",
+        "sort_order": 80,
+    },
+    {
+        "title": "Graphic Design",
+        "caption": "Canva & InShot — posters, logos & social media graphics.",
+        "media_type": "image",
+        "image": "gallery/design-square.png",
+        "sort_order": 90,
+    },
+    {
+        "title": "JD Hub Academy",
+        "caption": "Coding • STEM • Microsoft Office • AI • Design.",
+        "media_type": "image",
+        "image": "gallery/academy-landscape.png",
+        "sort_order": 100,
+    },
+]
 
 
 class Command(BaseCommand):
@@ -312,8 +552,10 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_HEADING("Seeding systems..."))
         for item in SYSTEMS:
             features = "\n".join(item.pop("features"))
+            shots = item.pop("screenshots", [])
+            screenshots = "\n".join(f"{p}|{c}" for p, c in shots)
             System.objects.update_or_create(
-                title=item["title"], defaults={**item, "features": features}
+                title=item["title"], defaults={**item, "features": features, "screenshots": screenshots}
             )
 
         self.stdout.write(self.style.MIGRATE_HEADING("Seeding courses..."))
