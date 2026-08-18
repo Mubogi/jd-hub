@@ -3,14 +3,17 @@
 # Render will create the web service and database defined below.
 # After the first deploy, set DJANGO_SECRET_KEY and an admin password as
 # environment variables (see README → Deploying to Render).
-preDeploy: "./build.sh"
+#
+# Note: preDeployCommand is paid-plan only, so build.sh (migrate, collectstatic,
+# seed, ensuresuperuser) runs as part of buildCommand instead. All steps are
+# idempotent, so this is safe on every deploy.
 services:
   - type: web
     name: jd-hub
     runtime: python
     plan: free
     region: oregon
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && bash build.sh
     startCommand: gunicorn jdhub.wsgi:application --log-file -
     healthCheckPath: /
     envVars:
@@ -25,6 +28,13 @@ services:
         value: "256700000000"
       - key: DJANGO_CONTACT_EMAIL
         value: "info@jdhub.example"
+      # Admin login (created on first build by ensuresuperuser).
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
       - key: WEB_CONCURRENCY
         value: "2"
       # Auto-linked to the database below.
@@ -37,3 +47,4 @@ databases:
   - name: jd-hub-db
     plan: free
     ipAllowList: []
+
