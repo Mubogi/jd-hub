@@ -7,7 +7,7 @@
   <meta name="description" content="{% block meta_description %}Jordan Design Hub — innovation, education, apps, media & AI solutions. We build web & mobile apps (Android/iOS), run a paid online academy on Google Meet, deliver church media training, connect holiday tutors to students (Nursery–S6), and teach AI optimization. Based in Uganda.{% endblock %}">
   <meta name="keywords" content="Jordan Design Hub, JD Hub, web development Uganda, Android app development, iOS app development, church media training, holiday tutors Uganda, Google Meet classes, AI optimization training, graphic design, Django web apps, PWA development">
   <meta name="author" content="Jordan Design Hub">
-  <meta name="theme-color" content="#0b1f3a">
+  <meta name="theme-color" content="#7a0e1f">
   <link rel="canonical" href="{{ SITE_URL }}{{ request.path }}">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="{% static 'hub/img/favicon.svg' %}">
@@ -56,8 +56,7 @@
   <nav class="navbar navbar-expand-lg fixed-top navbar-jd" id="mainNav">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
-        <span class="brand-mark" aria-hidden="true">JD</span>
-        <span class="brand-text">Jordan Design Hub<small class="d-block">{{ SITE_TAGLINE }}</small></span>
+        <img src="{% static 'hub/img/logo-light.svg' %}" alt="Jordan Design Hub" class="brand-logo" width="180" height="40">
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -92,8 +91,7 @@
       <div class="row g-4">
         <div class="col-lg-4">
           <div class="d-flex align-items-center gap-2 mb-3">
-            <span class="brand-mark">JD</span>
-            <span class="footer-brand">Jordan Design Hub</span>
+            <img src="{% static 'hub/img/logo-light.svg' %}" alt="Jordan Design Hub" class="brand-logo" width="180" height="40">
           </div>
           <p class="text-white-50 small mb-3">Jordan Design Hub — web &amp; mobile apps, online academy, church media, holiday tutoring, graphics, and AI optimization training in Uganda.</p>
           <div class="d-flex gap-2">

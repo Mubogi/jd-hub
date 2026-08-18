@@ -1,11 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0d6efd"/>
-      <stop offset="1" stop-color="#14b8a6"/>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e6c55c"/>
+      <stop offset="1" stop-color="#c9a227"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#g)"/>
+  <rect width="64" height="64" rx="14" fill="#ffffff" stroke="#e6c55c" stroke-width="2"/>
   <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle"
-        font-family="'Space Grotesk', Arial, sans-serif" font-size="30" font-weight="700" fill="#ffffff">JD</text>
+        font-family="'Space Grotesk', Arial, sans-serif" font-size="32" font-weight="700" fill="#c8102e">JD</text>
+  <rect x="12" y="50" width="40" height="4" rx="2" fill="url(#gold)"/>
 </svg>
