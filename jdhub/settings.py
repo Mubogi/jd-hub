@@ -155,6 +155,16 @@ WHATSAPP_NUMBER = os.environ.get("DJANGO_WHATSAPP_NUMBER", "256754687597")
 CONTACT_EMAIL = os.environ.get("DJANGO_CONTACT_EMAIL", "jordandesignhub@gmail.com")
 SITE_OWNER = "Jordan Design Hub"
 
+# --- Google Meet / Calendar integration -------------------------------------
+# Set these in Render's environment to enable automatic Meet link creation.
+# GOOGLE_SERVICE_ACCOUNT_JSON = full JSON contents of the service-account key.
+# GOOGLE_CALENDAR_ID = the Google Calendar email to create events on
+#                       (e.g. jordandesignhub@gmail.com). The calendar MUST be
+#                       shared with the service-account email with "Make changes
+#                       to events" permission.
+# When unset, the approve flow degrades gracefully (admin pastes link manually).
+GOOGLE_CALENDAR_ID = os.environ.get("GOOGLE_CALENDAR_ID", "jordandesignhub@gmail.com")
+
 # --- Security (production hardening) ----------------------------------------
 if not DEBUG:
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30

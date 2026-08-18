@@ -36,3 +36,7 @@ Thumbs.db
 
 # Logs
 *.log
+# Google service account keys — never commit
+*-96093db76cde.json
+*-iam.gserviceaccount*.json
+service-account*.json

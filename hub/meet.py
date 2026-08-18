@@ -83,6 +83,9 @@ def create_meet_link(
         return ""
 
     end_dt = start_dt + timedelta(minutes=duration_minutes)
+    # Service accounts cannot invite attendees without Domain-Wide Delegation,
+    # so we omit attendees here. The Meet link is emailed to the student
+    # separately by the Django approve action via send_mail.
     body = {
         "summary": summary or "Jordan Design Hub class",
         "description": description,
@@ -94,7 +97,6 @@ def create_meet_link(
                 "conferenceSolutionKey": {"type": "hangoutsMeet"},
             }
         },
-        "attendees": [{"email": attendee_email}] if attendee_email else [],
     }
 
     try:
@@ -103,7 +105,6 @@ def create_meet_link(
             calendarId=calendar_id,
             body=body,
             conferenceDataVersion=1,
-            sendUpdates="all",
         ).execute()
         # The Meet join URL lives under conferenceData.entryPoints.
         meet_url = ""

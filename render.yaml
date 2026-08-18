@@ -37,6 +37,14 @@ services:
         sync: false
       - key: WEB_CONCURRENCY
         value: "2"
+      # Google Meet auto-creation. GOOGLE_SERVICE_ACCOUNT_JSON must be the FULL
+      # contents of the service-account JSON key file. GOOGLE_CALENDAR_ID is the
+      # Google Calendar to create events on (share it with the service account
+      # email with "Make changes to events" permission). See hub/meet.py.
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: GOOGLE_CALENDAR_ID
+        value: "jordandesignhub@gmail.com"
       # Auto-linked to the database below.
       - fromDatabase:
           name: jd-hub-db
