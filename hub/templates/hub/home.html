@@ -1,7 +1,7 @@
 {% extends "hub/base.html" %}
 {% load static %}
 
-{% block title %}JD Hub: Innovation, Education &amp; Software Solutions{% endblock %}
+{% block title %}Jordan Design Hub — Innovation, Education, Apps, Media & AI Solutions{% endblock %}
 
 {% block content %}
 <!-- ===== Hero ===== -->
@@ -14,9 +14,9 @@
           <i class="fa-solid fa-bolt me-1"></i> {{ SITE_TAGLINE }}
         </span>
         <h1 class="display-3 fw-extrabold mb-3 hero-title">
-          JD Hub: <span class="text-gradient">Innovation, Education &amp; Software Solutions</span>
+          Jordan Design Hub: <span class="text-gradient">Apps, Academy, Media &amp; AI</span>
         </h1>
-        <p class="lead mb-4 text-white-50 hero-sub">{{ HERO_SUBTITLE|default:"Innovation, education, and software solutions for schools, SACCOs, and institutions." }}</p>
+        <p class="lead mb-4 text-white-50 hero-sub">{{ HERO_SUBTITLE|default:"We build web & mobile apps (Android & iOS), run a paid online academy on Google Meet, deliver church media training, connect holiday tutors to students, design graphics, and teach AI optimization — across Uganda and beyond." }}</p>
         <div class="d-flex flex-wrap gap-3">
           <a href="#systems" class="btn btn-accent btn-lg rounded-pill px-4">
             <i class="fa-solid fa-cube me-1"></i> Explore Systems
@@ -26,9 +26,9 @@
           </a>
         </div>
         <div class="hero-stats mt-5 d-flex flex-wrap gap-4">
-          <div><span class="stat-num">3+</span><span class="stat-label">Flagship Systems</span></div>
+          <div><span class="stat-num">6+</span><span class="stat-label">Services</span></div>
           <div><span class="stat-num">5+</span><span class="stat-label">Academy Courses</span></div>
-          <div><span class="stat-num">100%</span><span class="stat-label">Offline-Ready</span></div>
+          <div><span class="stat-num">100%</span><span class="stat-label">Online &amp; Offline</span></div>
         </div>
       </div>
       <div class="col-lg-5 d-none d-lg-block">
@@ -122,8 +122,33 @@
   <div class="container">
     <div class="text-center section-head mx-auto">
       <span class="eyebrow">Academy &amp; Tutoring Hub</span>
-      <h2 class="section-title">Adult education &amp; practical skills</h2>
-      <p class="section-sub">{{ site.academy_intro|default:"Hands-on courses for adult learners and students." }}</p>
+      <h2 class="section-title">Learn online, live on Google Meet</h2>
+      <p class="section-sub">{{ site.academy_intro|default:"Paid, instructor-led online classes. Enrol, pay, then join live Google Meet sessions — for students (Nursery–S6) and adult learners." }}</p>
+    </div>
+
+    <!-- How it works -->
+    <div class="row g-3 mb-4 justify-content-center">
+      <div class="col-md-4">
+        <div class="how-step text-center">
+          <span class="how-num">1</span>
+          <h3 class="h6 fw-bold mb-1">Enrol &amp; Pay</h3>
+          <p class="small text-muted mb-0">Choose a course and email us to book your slot.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="how-step text-center">
+          <span class="how-num">2</span>
+          <h3 class="h6 fw-bold mb-1">Get Your Meet Link</h3>
+          <p class="small text-muted mb-0">We send a Google Meet link for your live class.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="how-step text-center">
+          <span class="how-num">3</span>
+          <h3 class="h6 fw-bold mb-1">Join &amp; Learn</h3>
+          <p class="small text-muted mb-0">Attend live, get recordings, and earn a certificate.</p>
+        </div>
+      </div>
     </div>
 
     <!-- Filters -->
@@ -132,6 +157,7 @@
       <button class="filter-btn" data-filter="stem"><i class="fa-solid fa-flask me-1"></i> STEM</button>
       <button class="filter-btn" data-filter="software"><i class="fa-solid fa-code me-1"></i> Software</button>
       <button class="filter-btn" data-filter="financials"><i class="fa-solid fa-chart-line me-1"></i> Financials</button>
+      <button class="filter-btn" data-filter="ai"><i class="fa-solid fa-robot me-1"></i> AI</button>
     </div>
 
     <div class="row g-4" id="courseGrid">
@@ -176,7 +202,7 @@
     <div class="text-center section-head mx-auto">
       <span class="eyebrow">Services &amp; Consultancy</span>
       <h2 class="section-title">From idea to deployed solution</h2>
-      <p class="section-sub">{{ site.services_intro|default:"Custom software, ICT infrastructure, and media production — delivered end to end." }}</p>
+      <p class="section-sub">{{ site.services_intro|default:"Web & mobile apps, graphics, church media, holiday tutoring, AI training, and ICT infrastructure — delivered end to end." }}</p>
     </div>
     <div class="row g-4">
       {% for service in services %}
@@ -229,7 +255,11 @@
         </figure>
       </div>
       {% empty %}
-      <div class="col-12 text-center text-muted py-5">No media published yet.</div>
+      <div class="col-12 text-center text-muted py-5">
+        <i class="fa-solid fa-images fa-2x mb-2 d-block opacity-50"></i>
+        <p class="mb-1">Our portfolio will appear here soon.</p>
+        <p class="small mb-0">In the meantime, <a href="{% url 'contact' %}">ask for samples</a> on WhatsApp or email.</p>
+      </div>
       {% endfor %}
     </div>
   </div>
@@ -240,8 +270,8 @@
   <div class="container">
     <div class="row align-items-center text-white">
       <div class="col-lg-8">
-        <h2 class="h3 fw-bold mb-1">Ready to build, learn, or deploy?</h2>
-        <p class="mb-0 text-white-50">Talk to {{ SITE_OWNER }} about systems, the academy, or consultancy — direct to WhatsApp or email.</p>
+        <h2 class="h3 fw-bold mb-1">Ready to build, learn, or get trained?</h2>
+        <p class="mb-0 text-white-50">Talk to {{ SITE_OWNER }} about an app, a class, church media, a tutor, graphics, or AI training — direct to WhatsApp or email.</p>
       </div>
       <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
         <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" class="btn btn-accent btn-lg rounded-pill me-2">

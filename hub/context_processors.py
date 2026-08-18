@@ -23,6 +23,7 @@ def site_settings(request):
         "SITE_NAME": settings.SITE_NAME,
         "SITE_TAGLINE": settings.SITE_TAGLINE,
         "SITE_OWNER": settings.SITE_OWNER,
+        "SITE_URL": settings.SITE_URL.rstrip("/"),
         "WHATSAPP_NUMBER": whatsapp,
         "CONTACT_EMAIL": email,
         "SITE_ADDRESS": address,

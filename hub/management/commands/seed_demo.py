@@ -171,30 +171,123 @@ COURSES = [
         ],
         "sort_order": 50,
     },
+    {
+        "title": "AI Optimization & Prompt Engineering",
+        "category": "ai",
+        "icon": "fa-solid fa-robot",
+        "level": "Beginner to Intermediate",
+        "duration": "4 weeks",
+        "description": (
+            "Learn to use AI tools effectively — writing better prompts, automating "
+            "everyday tasks, and integrating AI into your work and business."
+        ),
+        "curriculum": [
+            "How large language models work",
+            "Prompt engineering fundamentals",
+            "AI tools for productivity (writing, research, code)",
+            "AI for business workflows & automation",
+        ],
+        "sort_order": 60,
+    },
 ]
 
 SERVICES = [
     {
-        "title": "Custom Django / PWA Software Builds",
+        "title": "Web Design & Development",
         "icon": "fa-solid fa-code-branch",
         "description": (
-            "Bespoke, offline-first web applications built with Django and progressive web app "
-            "technology — from requirements gathering to deployment and support."
+            "Custom, fast, mobile-friendly websites and web apps built with Django "
+            "and progressive web app technology — from design to deployment and support."
         ),
         "deliverables": [
-            "Requirements analysis & system design",
-            "Django backend + PWA frontend",
+            "Requirements & UX design",
+            "Django backend + responsive frontend",
             "Deployment and staff training",
             "Ongoing maintenance & support",
         ],
         "sort_order": 10,
     },
     {
+        "title": "Android & iOS App Development",
+        "icon": "fa-solid fa-mobile-screen-button",
+        "description": (
+            "Native and cross-platform mobile applications for Android and iOS — "
+            "from concept and wireframes to App Store / Play Store publishing."
+        ),
+        "deliverables": [
+            "App design & prototyping",
+            "Android + iOS development",
+            "API integration & backend",
+            "Store submission & updates",
+        ],
+        "sort_order": 20,
+    },
+    {
+        "title": "Graphics Design",
+        "icon": "fa-solid fa-pen-nib",
+        "description": (
+            "Logos, posters, flyers, social media kits, and brand identities — "
+            "all kinds of graphics for events, business, and ministry."
+        ),
+        "deliverables": [
+            "Logo & brand identity",
+            "Posters, flyers & banners",
+            "Social media graphics & kits",
+            "Print-ready artwork",
+        ],
+        "sort_order": 30,
+    },
+    {
+        "title": "Church Media & Training",
+        "icon": "fa-solid fa-tower-broadcast",
+        "description": (
+            "End-to-end church media setup and hands-on training: livestreaming "
+            "with OBS, lyric/projection with OpenLP, and audio post-production."
+        ),
+        "deliverables": [
+            "OBS livestream configuration",
+            "OpenLP projection setup",
+            "Audio recording & editing workflow",
+            "Operator training & runbooks",
+        ],
+        "sort_order": 40,
+    },
+    {
+        "title": "Holiday Tutoring (Nursery–S6)",
+        "icon": "fa-solid fa-user-graduate",
+        "description": (
+            "We connect students from Nursery to S6 with qualified holiday tutors "
+            "online. Email us to book a tutor — classes happen over Google Meet."
+        ),
+        "deliverables": [
+            "Match students to subject tutors",
+            "Booked via email / WhatsApp",
+            "Live Google Meet sessions",
+            "Progress feedback for parents",
+        ],
+        "sort_order": 50,
+    },
+    {
+        "title": "AI Optimization & Training",
+        "icon": "fa-solid fa-robot",
+        "description": (
+            "Learn to use AI tools effectively — prompt engineering, AI-assisted "
+            "productivity, and integrating AI into your work and business."
+        ),
+        "deliverables": [
+            "Prompt engineering fundamentals",
+            "AI tools for productivity",
+            "AI for business workflows",
+            "Hands-on guided practice",
+        ],
+        "sort_order": 60,
+    },
+    {
         "title": "ICT Infrastructure & Networking",
         "icon": "fa-solid fa-network-wired",
         "description": (
-            "Local area networks, server setup, and workstation deployment for schools, SACCOs, "
-            "and small offices — including structured cabling and Wi-Fi."
+            "Local area networks, server setup, and workstation deployment for "
+            "schools, offices, and small businesses — including cabling and Wi-Fi."
         ),
         "deliverables": [
             "Network design & cabling",
@@ -202,65 +295,13 @@ SERVICES = [
             "Workstation setup & imaging",
             "Security hardening & documentation",
         ],
-        "sort_order": 20,
-    },
-    {
-        "title": "Media & Livestreaming Setup",
-        "icon": "fa-solid fa-tower-broadcast",
-        "description": (
-            "End-to-end media setup for events and worship: OBS for livestreaming, OpenLP for "
-            "lyric/projection, and Adobe Audition for audio post-production."
-        ),
-        "deliverables": [
-            "OBS livestream configuration",
-            "OpenLP projection setup",
-            "Adobe Audition audio workflow",
-            "Operator training & runbooks",
-        ],
-        "sort_order": 30,
+        "sort_order": 70,
     },
 ]
 
-MEDIA_ITEMS = [
-    {
-        "title": "School Management Dashboard",
-        "caption": "Admin dashboard for the offline-first school system.",
-        "media_type": "image",
-        "sort_order": 10,
-    },
-    {
-        "title": "SACCO Analytics Report",
-        "caption": "Portfolio-at-Risk analytics view.",
-        "media_type": "image",
-        "sort_order": 20,
-    },
-    {
-        "title": "JD Hub Academy Promo",
-        "caption": "Promo video for the adult-education academy.",
-        "media_type": "video",
-        "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        "sort_order": 30,
-    },
-    {
-        "title": "OBS Livestream Setup",
-        "caption": "Live event streaming configuration.",
-        "media_type": "video",
-        "video_url": "https://www.youtube.com/watch?v=ScMzIvxBSi4",
-        "sort_order": 40,
-    },
-    {
-        "title": "Event Poster Design",
-        "caption": "Canva poster for a community tech bootcamp.",
-        "media_type": "image",
-        "sort_order": 50,
-    },
-    {
-        "title": "Scratch Coding Showcase",
-        "caption": "Student projects from the Scratch coding course.",
-        "media_type": "image",
-        "sort_order": 60,
-    },
-]
+# Media gallery is intentionally empty for now — the user will add real
+# portfolio items (posters, videos, screenshots) via the admin later.
+MEDIA_ITEMS = []
 
 
 class Command(BaseCommand):
@@ -281,6 +322,13 @@ class Command(BaseCommand):
             Course.objects.update_or_create(
                 title=item["title"], defaults={**item, "curriculum": curriculum}
             )
+        # Remove courses no longer in the seed list (stale placeholders).
+        kept_course_titles = [c["title"] for c in COURSES]
+        deleted_courses, _ = Course.objects.exclude(
+            title__in=kept_course_titles
+        ).delete()
+        if deleted_courses:
+            self.stdout.write(f"  ↻ Removed {deleted_courses} stale course(s).")
 
         self.stdout.write(self.style.MIGRATE_HEADING("Seeding services..."))
         for item in SERVICES:
@@ -288,15 +336,53 @@ class Command(BaseCommand):
             Service.objects.update_or_create(
                 title=item["title"], defaults={**item, "deliverables": deliverables}
             )
+        # Remove services no longer in the seed list (stale placeholders).
+        kept_service_titles = [s["title"] for s in SERVICES]
+        deleted_services, _ = Service.objects.exclude(
+            title__in=kept_service_titles
+        ).delete()
+        if deleted_services:
+            self.stdout.write(f"  ↻ Removed {deleted_services} stale service(s).")
 
-        self.stdout.write(self.style.MIGRATE_HEADING("Seeding media portfolio..."))
-        for item in MEDIA_ITEMS:
-            MediaItem.objects.update_or_create(
-                title=item["title"], defaults=item
+        self.stdout.write(self.style.MIGRATE_HEADING("Syncing media portfolio..."))
+        if MEDIA_ITEMS:
+            for item in MEDIA_ITEMS:
+                MediaItem.objects.update_or_create(
+                    title=item["title"], defaults=item
+                )
+        # Remove placeholder media (no real uploads yet). Items without an
+        # uploaded image file are considered placeholders and are deleted so
+        # the gallery stays clean until the user adds real work via the admin.
+        deleted_media, _ = MediaItem.objects.filter(image__isnull=True).exclude(
+            title__in=[m["title"] for m in MEDIA_ITEMS]
+        ).delete()
+        if deleted_media:
+            self.stdout.write(f"  ↻ Removed {deleted_media} placeholder media item(s).")
+
+        self.stdout.write(self.style.MIGRATE_HEADING("Updating site settings..."))
+        site = SiteSettings.get()
+        # Refresh intro copy + contact info to the current defaults if they are
+        # still on a known placeholder value from an earlier seed run.
+        if site.whatsapp_number in {"", "256700000000"}:
+            site.whatsapp_number = "256754687597"
+        if site.contact_email in {"", "info@jdhub.example"}:
+            site.contact_email = "jordandesignhub@gmail.com"
+        if site.hero_subtitle in {"", "We design, build, and deploy offline-first "
+                "software systems, run a practical skills academy, and deliver ICT "
+                "consultancy — serving schools, SACCOs, and institutions across Uganda."}:
+            site.hero_subtitle = (
+                "We build web & mobile apps (Android and iOS), run a paid online "
+                "academy on Google Meet, deliver church media training, connect "
+                "holiday tutors to students (Nursery–S6), design graphics, and "
+                "teach AI optimization — across Uganda and beyond."
             )
-
-        self.stdout.write(self.style.MIGRATE_HEADING("Ensuring site settings exist..."))
-        SiteSettings.get()
+        if site.academy_intro in {"", "Practical, hands-on courses for adult "
+                "learners and students."}:
+            site.academy_intro = (
+                "Paid, instructor-led online classes on Google Meet. Enrol and pay, "
+                "then join live sessions for students (Nursery–S6) and adult learners."
+            )
+        site.save()
 
         self.stdout.write(self.style.MIGRATE_HEADING("Generating PDF whitepapers..."))
         for system in System.objects.all():

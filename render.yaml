@@ -25,9 +25,9 @@ services:
       - key: DJANGO_SECRET_KEY
         sync: false
       - key: DJANGO_WHATSAPP_NUMBER
-        value: "256700000000"
+        value: "256754687597"
       - key: DJANGO_CONTACT_EMAIL
-        value: "info@jdhub.example"
+        value: "jordandesignhub@gmail.com"
       # Admin login (created on first build by ensuresuperuser).
       - key: DJANGO_SUPERUSER_USERNAME
         sync: false

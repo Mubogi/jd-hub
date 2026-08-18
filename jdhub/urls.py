@@ -41,6 +41,6 @@ if settings.DEBUG:
     ]
 
 
-admin.site.site_header = "JD Hub Administration"
-admin.site.site_title = "JD Hub Admin"
+admin.site.site_header = "Jordan Design Hub Administration"
+admin.site.site_title = "Jordan Design Hub Admin"
 admin.site.index_title = "Ecosystem Management"

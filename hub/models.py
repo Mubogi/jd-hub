@@ -73,6 +73,7 @@ class Course(models.Model):
         ("stem", "STEM"),
         ("software", "Software"),
         ("financials", "Financials"),
+        ("ai", "AI"),
     ]
 
     title = models.CharField(max_length=200)
@@ -221,23 +222,27 @@ class SiteSettings(models.Model):
 
     hero_subtitle = models.TextField(
         default=(
-            "We design, build, and deploy offline-first software systems, "
-            "run a practical skills academy, and deliver ICT consultancy — "
-            "serving schools, SACCOs, and institutions across Uganda."
+            "We build web & mobile apps (Android and iOS), run a paid online academy "
+            "on Google Meet, deliver church media training, connect holiday tutors to "
+            "students (Nursery–S6), design graphics, and teach AI optimization — "
+            "across Uganda and beyond."
         ),
     )
     academy_intro = models.TextField(
         blank=True,
-        default="Practical, hands-on courses for adult learners and students.",
+        default=(
+            "Paid, instructor-led online classes on Google Meet. Enrol and pay, then "
+            "join live sessions for students (Nursery–S6) and adult learners."
+        ),
     )
     services_intro = models.TextField(blank=True)
     gallery_intro = models.TextField(blank=True)
     whatsapp_number = models.CharField(
         max_length=20,
-        default="256700000000",
-        help_text="International format, no '+', e.g. 256700000000.",
+        default="256754687597",
+        help_text="International format, no '+', e.g. 256754687597.",
     )
-    contact_email = models.EmailField(default="info@jdhub.example")
+    contact_email = models.EmailField(default="jordandesignhub@gmail.com")
     address = models.CharField(max_length=255, blank=True, default="Kampala, Uganda")
 
     class Meta:

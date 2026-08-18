@@ -85,7 +85,7 @@ def _header_footer(canvas, doc):
     canvas.drawString(20 * mm, height - 11 * mm, "JD HUB")
     canvas.setFont("Helvetica", 9)
     canvas.setFillColor(BRAND_ACCENT)
-    canvas.drawRightString(width - 20 * mm, height - 11 * mm, "Mubogi Gastavas Jordan Tech Ecosystem")
+    canvas.drawRightString(width - 20 * mm, height - 11 * mm, "Jordan Design Hub")
     # Footer.
     canvas.setStrokeColor(BRAND_MUTED)
     canvas.setLineWidth(0.5)
@@ -179,7 +179,7 @@ def build_pdf(system: System, output_path: Path | None = None) -> Path:
     story.append(HRFlowable(width="100%", thickness=0.5, color=BRAND_MUTED, spaceAfter=8))
     story.append(Paragraph(
         f"For a live demonstration, deployment, or customisation, contact {settings.SITE_OWNER} "
-        f"via the JD Hub website or WhatsApp (+{getattr(settings, 'WHATSAPP_NUMBER', '')}).",
+        f"via the Jordan Design Hub website or WhatsApp (+{getattr(settings, 'WHATSAPP_NUMBER', '')}).",
         s["footer"],
     ))
 

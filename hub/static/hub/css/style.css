@@ -73,6 +73,11 @@ h1, h2, h3, .display-3, .display-5, .hero-title { font-family: var(--jd-display)
 .bg-soft-stem { background: rgba(236, 72, 153, .14); color: #ec4899; }
 .bg-soft-software { background: rgba(59, 130, 246, .14); color: #3b82f6; }
 .bg-soft-financials { background: rgba(16, 185, 129, .14); color: #10b981; }
+.bg-soft-ai { background: rgba(99, 102, 241, .14); color: #6366f1; }
+
+/* Academy "how it works" steps */
+.how-step { background: var(--jd-card); border: 1px solid var(--jd-border); border-radius: 16px; padding: 1.5rem 1rem; }
+.how-num { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: var(--jd-blue); color: #fff; font-weight: 700; margin-bottom: .75rem; }
 .text-education { color: #3b82f6; }
 .text-finance { color: #0d9488; }
 .text-database { color: #8b5cf6; }

@@ -1,4 +1,4 @@
-"""Sitemap configuration for JD Hub."""
+"""Sitemap configuration for Jordan Design Hub."""
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
@@ -23,6 +23,9 @@ class SystemSitemap(Sitemap):
     def items(self):
         return System.objects.filter(is_published=True)
 
+    def location(self, obj):
+        return reverse("system_pdf", kwargs={"slug": obj.slug})
+
     def lastmod(self, obj):
         return obj.updated_at
 
@@ -33,6 +36,10 @@ class CourseSitemap(Sitemap):
 
     def items(self):
         return Course.objects.filter(is_published=True)
+
+    def location(self, obj):
+        # Courses are shown on the home page academy section.
+        return f"{reverse('home')}#academy"
 
     def lastmod(self, obj):
         return obj.updated_at
