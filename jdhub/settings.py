@@ -150,7 +150,7 @@ SITE_NAME = "Jordan Design Hub"
 SITE_TAGLINE = "Innovation, Education, Apps, Media & AI Solutions"
 # Public base URL (no trailing slash) used for canonical/OG tags. Override in
 # production with the real deployed URL, e.g. https://jd-hub-xyz.onrender.com.
-SITE_URL = os.environ.get("DJANGO_SITE_URL", "https://jd-hub.onrender.com")
+SITE_URL = os.environ.get("DJANGO_SITE_URL", "https://jd-hub-8e5d.onrender.com")
 WHATSAPP_NUMBER = os.environ.get("DJANGO_WHATSAPP_NUMBER", "256754687597")
 CONTACT_EMAIL = os.environ.get("DJANGO_CONTACT_EMAIL", "jordandesignhub@gmail.com")
 SITE_OWNER = "Jordan Design Hub"
