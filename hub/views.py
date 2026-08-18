@@ -66,7 +66,8 @@ def enrol(request):
                     f"Level: {request.POST.get('level', '')}\n"
                     f"Schedule: {request.POST.get('schedule', '')}\n"
                     f"Notes: {request.POST.get('notes', '')}\n\n"
-                    f"Review and approve at /admin/hub/enrolment/"
+                    f"Reply to the student to confirm fees & payment, then approve at "
+                    f"/admin/hub/enrolment/ once paid."
                 ),
                 from_email=settings.CONTACT_EMAIL,
                 recipient_list=[site.contact_email or settings.CONTACT_EMAIL],

@@ -136,42 +136,82 @@ class EnrolmentAdmin(admin.ModelAdmin):
     )
     actions = ["approve_and_notify", "mark_rejected", "mark_completed"]
 
-    @admin.action(description="Approve & email Meet link to student")
+    @admin.action(description="Approve & create + email Google Meet link")
     def approve_and_notify(self, request, queryset):
-        """Approve enrolments and (once Google Meet is wired up) email the link.
+        """Approve enrolments, auto-create a Google Meet link (when Google
+        service account is configured), and email it to the student.
 
-        Today this marks the enrolment approved and, if a meet_link is present,
-        emails it to the student. When the Google Calendar service account is
-        configured, approving will also create the Meet link automatically.
+        When Google is not configured yet, the enrolment is still marked
+        approved and the admin can paste a Meet link manually in the
+        meet_link field, then re-run this action to email it.
         """
+        from datetime import datetime, timedelta
         from django.core.mail import send_mail
         from django.conf import settings
 
+        from hub.meet import create_meet_link, is_configured
+
+        meet_configured = is_configured()
         count = 0
+        emailed = 0
         for enrolment in queryset.filter(status__in=["pending", "rejected"]):
             enrolment.status = "approved"
+
+            # Auto-create a Meet link if Google is configured and none exists.
+            if meet_configured and not enrolment.meet_link:
+                # Default to tomorrow 10:00 EAT if no schedule hint parsed.
+                start_dt = datetime.now() + timedelta(days=1)
+                start_dt = start_dt.replace(hour=10, minute=0, second=0, microsecond=0)
+                link = create_meet_link(
+                    summary=f"Jordan Design Hub — {enrolment.student_name}",
+                    start_dt=start_dt,
+                    duration_minutes=60,
+                    attendee_email=enrolment.email,
+                    description=f"Online class for {enrolment.student_name} ({enrolment.get_level_display()}). "
+                                f"Subject: {enrolment.subject or 'n/a'}.",
+                )
+                if link:
+                    enrolment.meet_link = link
+
             enrolment.save()
-            # Email the student their confirmation (and Meet link if set).
-            if enrolment.meet_link:
+
+            # Email the student their confirmation + Meet link.
+            if enrolment.meet_link or meet_configured:
                 try:
                     send_mail(
                         subject="Your Jordan Design Hub class is approved — Google Meet link inside",
-                        message=(
-                            f"Hello {enrolment.student_name},\n\n"
-                            f"Your enrolment is approved. Join your class on Google Meet:\n"
-                            f"{enrolment.meet_link}\n\n"
-                            f"If you have not yet paid, please complete payment via WhatsApp "
-                            f"before the first session.\n\n"
-                            f"— Jordan Design Hub"
-                        ),
+                        message=self._approval_email_body(enrolment),
                         from_email=settings.CONTACT_EMAIL,
                         recipient_list=[enrolment.email],
                         fail_silently=True,
                     )
+                    emailed += 1
                 except Exception:
                     pass
             count += 1
-        self.message_user(request, f"Approved {count} enrolment(s).")
+
+        note = (
+            f"Approved {count} enrolment(s); emailed {emailed}. "
+            + ("Meet links created automatically." if meet_configured
+               else "Google Meet not configured — paste meet_link manually then re-run to email.")
+        )
+        self.message_user(request, note)
+
+    @staticmethod
+    def _approval_email_body(enrolment) -> str:
+        """Render the plain-text approval email body for a student."""
+        site = SiteSettings.get()
+        meet_line = f"\nJoin your class on Google Meet:\n{enrolment.meet_link}\n" if enrolment.meet_link else ""
+        return (
+            f"Hello {enrolment.student_name},\n\n"
+            f"Your enrolment at Jordan Design Hub is approved. {meet_line}\n"
+            f"If you have not yet paid, please complete payment before the first session:\n"
+            f"  MTN MoMo: {site.momo_number} ({site.momo_name})\n"
+            f"  Airtel Money: {site.airtel_number} ({site.airtel_name})\n"
+            f"  Then confirm on WhatsApp: https://wa.me/{site.whatsapp_number}\n\n"
+            f"We look forward to seeing you in class.\n\n"
+            f"— Jordan Design Hub"
+        )
 
     @admin.action(description="Mark selected as Rejected")
     def mark_rejected(self, request, queryset):
@@ -189,6 +229,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Hero / Intro Copy", {"fields": ("hero_subtitle", "academy_intro", "services_intro", "gallery_intro")}),
         ("Contact Channels", {"fields": ("whatsapp_number", "contact_email", "address")}),
+        ("Payment Details (shown after enrolment)", {"fields": ("momo_name", "momo_number", "airtel_name", "airtel_number", "payment_instructions")}),
     )
 
     def has_add_permission(self, request):

@@ -24,13 +24,32 @@
           <p class="text-muted small mb-4">Fields marked with * are required. We'll reach out on WhatsApp to confirm payment and schedule.</p>
 
           {% if sent %}
-          <div class="alert alert-success d-flex align-items-center" role="alert">
-            <i class="fa-solid fa-circle-check me-2"></i>
-            <div>
-              <strong>Enrolment received!</strong> Next step: complete payment on WhatsApp
-              <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" class="alert-link">here</a>.
-              Once approved, your Google Meet link will be emailed to you.
+          <div class="alert alert-success border-success" role="alert">
+            <h4 class="alert-heading h6"><i class="fa-solid fa-circle-check me-2"></i>Enrolment received!</h4>
+            <p class="mb-2 small">Your request has been saved. To confirm your slot, complete payment now:</p>
+            <hr class="my-2">
+            <div class="row g-2 small">
+              <div class="col-md-6">
+                <div class="card border-0 bg-light rounded-3 p-2 h-100">
+                  <strong><i class="fa-solid fa-mobile-screen me-1 text-success"></i> MTN MoMo</strong><br>
+                  <span class="fw-bold">{{ site.momo_number }}</span><br>
+                  <span class="text-muted">{{ site.momo_name }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card border-0 bg-light rounded-3 p-2 h-100">
+                  <strong><i class="fa-solid fa-mobile-screen me-1 text-danger"></i> Airtel Money</strong><br>
+                  <span class="fw-bold">{{ site.airtel_number }}</span><br>
+                  <span class="text-muted">{{ site.airtel_name }}</span>
+                </div>
+              </div>
             </div>
+            <ol class="ps-3 mt-2 mb-2 small">
+              {% for step in site.payment_instructions.splitlines %}{% if step.strip %}<li>{{ step.strip }}</li>{% endif %}{% endfor %}
+            </ol>
+            <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" class="btn btn-success rounded-pill btn-sm">
+              <i class="fa-brands fa-whatsapp me-1"></i> Confirm payment on WhatsApp
+            </a>
           </div>
           {% endif %}
 

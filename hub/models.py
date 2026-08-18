@@ -244,6 +244,32 @@ class SiteSettings(models.Model):
     )
     contact_email = models.EmailField(default="jordandesignhub@gmail.com")
     address = models.CharField(max_length=255, blank=True, default="Kampala, Uganda")
+    momo_name = models.CharField(
+        max_length=100, blank=True, default="Jordan Design Hub",
+        help_text="Name registered on the MTN Mobile Money account.",
+    )
+    momo_number = models.CharField(
+        max_length=20, blank=True, default="256754687597",
+        help_text="MTN MoMo number (international format, no '+').",
+    )
+    airtel_name = models.CharField(
+        max_length=100, blank=True, default="Jordan Design Hub",
+        help_text="Name registered on the Airtel Money account.",
+    )
+    airtel_number = models.CharField(
+        max_length=20, blank=True, default="256754687597",
+        help_text="Airtel Money number (international format, no '+').",
+    )
+    payment_instructions = models.TextField(
+        blank=True,
+        default=(
+            "1. Choose MTN MoMo or Airtel Money.\n"
+            "2. Send fees to the number shown.\n"
+            "3. Keep the transaction ID.\n"
+            "4. Confirm on WhatsApp with your transaction ID.\n"
+        ),
+        help_text="Step-by-step payment instructions shown after enrolment.",
+    )
 
     class Meta:
         verbose_name = "Site Settings"
