@@ -7,6 +7,7 @@
   <meta name="description" content="{% block meta_description %}Jordan Design Hub — innovation, education, apps, media & AI solutions. We build web & mobile apps (Android/iOS), run a paid online academy on Google Meet, deliver church media training, connect holiday tutors to students (Nursery–S6), and teach AI optimization. Based in Uganda.{% endblock %}">
   <meta name="keywords" content="Jordan Design Hub, JD Hub, web development Uganda, Android app development, iOS app development, church media training, holiday tutors Uganda, Google Meet classes, AI optimization training, graphic design, Django web apps, PWA development">
   <meta name="author" content="Jordan Design Hub">
+  <meta name="google-site-verification" content="ZFuSUI7MMg0drSMep2ihZtj4oywYGCwPxVFM0EHgvmY" />
   <meta name="theme-color" content="#7a0e1f">
   <link rel="canonical" href="{{ SITE_URL }}{{ request.path }}">
   <link rel="manifest" href="/manifest.webmanifest">
@@ -67,6 +68,7 @@
           <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#academy">Academy</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#services">Services</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#gallery">Gallery</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'enrol' %}">Enrol</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
           <li class="nav-item ms-lg-2">
             <button id="themeToggle" class="btn btn-sm btn-outline-light rounded-pill px-3" aria-label="Toggle dark mode">
@@ -74,8 +76,8 @@
             </button>
           </li>
           <li class="nav-item ms-lg-1">
-            <a class="btn btn-accent rounded-pill px-3" href="{% url 'home' %}#academy">
-              <i class="fa-solid fa-graduation-cap me-1"></i> Join Academy
+            <a class="btn btn-accent rounded-pill px-3" href="{% url 'enrol' %}">
+              <i class="fa-solid fa-graduation-cap me-1"></i> Enrol Now
             </a>
           </li>
         </ul>

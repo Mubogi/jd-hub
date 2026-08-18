@@ -9,6 +9,7 @@ from django.contrib import admin
 from hub.models import (
     ContactSubmission,
     Course,
+    Enrolment,
     MediaItem,
     Service,
     SiteSettings,
@@ -117,6 +118,70 @@ class ContactSubmissionAdmin(admin.ModelAdmin):
     @admin.action(description="Mark selected as Resolved")
     def mark_resolved(self, request, queryset):
         queryset.update(status="resolved")
+
+
+@admin.register(Enrolment)
+class EnrolmentAdmin(admin.ModelAdmin):
+    list_display = (
+        "student_name", "level", "course", "subject", "phone", "status", "created_at",
+    )
+    list_editable = ("status",)
+    list_filter = ("status", "level", "created_at")
+    search_fields = ("student_name", "email", "phone", "subject", "notes")
+    readonly_fields = ("created_at", "updated_at")
+    fieldsets = (
+        ("Student", {"fields": ("student_name", "email", "phone", "level")}),
+        ("Class", {"fields": ("course", "subject", "schedule", "notes")}),
+        ("Workflow", {"fields": ("status", "meet_link", "created_at", "updated_at")}),
+    )
+    actions = ["approve_and_notify", "mark_rejected", "mark_completed"]
+
+    @admin.action(description="Approve & email Meet link to student")
+    def approve_and_notify(self, request, queryset):
+        """Approve enrolments and (once Google Meet is wired up) email the link.
+
+        Today this marks the enrolment approved and, if a meet_link is present,
+        emails it to the student. When the Google Calendar service account is
+        configured, approving will also create the Meet link automatically.
+        """
+        from django.core.mail import send_mail
+        from django.conf import settings
+
+        count = 0
+        for enrolment in queryset.filter(status__in=["pending", "rejected"]):
+            enrolment.status = "approved"
+            enrolment.save()
+            # Email the student their confirmation (and Meet link if set).
+            if enrolment.meet_link:
+                try:
+                    send_mail(
+                        subject="Your Jordan Design Hub class is approved — Google Meet link inside",
+                        message=(
+                            f"Hello {enrolment.student_name},\n\n"
+                            f"Your enrolment is approved. Join your class on Google Meet:\n"
+                            f"{enrolment.meet_link}\n\n"
+                            f"If you have not yet paid, please complete payment via WhatsApp "
+                            f"before the first session.\n\n"
+                            f"— Jordan Design Hub"
+                        ),
+                        from_email=settings.CONTACT_EMAIL,
+                        recipient_list=[enrolment.email],
+                        fail_silently=True,
+                    )
+                except Exception:
+                    pass
+            count += 1
+        self.message_user(request, f"Approved {count} enrolment(s).")
+
+    @admin.action(description="Mark selected as Rejected")
+    def mark_rejected(self, request, queryset):
+        updated = queryset.update(status="rejected")
+        self.message_user(request, f"Rejected {updated} enrolment(s).")
+
+    @admin.action(description="Mark selected as Completed")
+    def mark_completed(self, request, queryset):
+        updated = queryset.update(status="completed")
+        self.message_user(request, f"Marked {updated} enrolment(s) as completed.")
 
 
 @admin.register(SiteSettings)

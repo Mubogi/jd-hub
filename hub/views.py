@@ -12,7 +12,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
-from hub.models import ContactSubmission, Course, MediaItem, Service, SiteSettings, System
+from hub.models import ContactSubmission, Course, Enrolment, MediaItem, Service, SiteSettings, System
 from hub.pdf import build_pdf
 
 
@@ -27,6 +27,62 @@ def home(request):
         "course_categories": Course.CATEGORY_CHOICES,
     }
     return render(request, "hub/home.html", context)
+
+
+@require_http_methods(["GET", "POST"])
+def enrol(request):
+    """Public enrolment form for the online academy / holiday tutoring."""
+    if request.method == "POST":
+        # Honeypot anti-spam (same approach as the contact form).
+        if request.POST.get("company_url"):
+            return redirect(f"{reverse('enrol')}?sent=1#enrol-form")
+
+        course_id = request.POST.get("course") or ""
+        Enrolment.objects.create(
+            student_name=(request.POST.get("student_name") or "").strip(),
+            email=(request.POST.get("email") or "").strip(),
+            phone=(request.POST.get("phone") or "").strip(),
+            course_id=course_id or None,
+            subject=(request.POST.get("subject") or "").strip(),
+            level=(request.POST.get("level") or "adult"),
+            schedule=(request.POST.get("schedule") or "").strip(),
+            notes=(request.POST.get("notes") or "").strip(),
+        )
+
+        # Best-effort notification email to the site owner.
+        try:
+            site = SiteSettings.get()
+            course_obj = Course.objects.filter(pk=course_id).first()
+            course_label = course_obj.title if course_obj else "General / Tutoring"
+            send_mail(
+                subject=f"[Jordan Design Hub] New enrolment — {course_label}",
+                message=(
+                    f"New enrolment request.\n\n"
+                    f"Student: {request.POST.get('student_name', '')}\n"
+                    f"Email: {request.POST.get('email', '')}\n"
+                    f"Phone: {request.POST.get('phone', '')}\n"
+                    f"Course: {course_label}\n"
+                    f"Subject: {request.POST.get('subject', '')}\n"
+                    f"Level: {request.POST.get('level', '')}\n"
+                    f"Schedule: {request.POST.get('schedule', '')}\n"
+                    f"Notes: {request.POST.get('notes', '')}\n\n"
+                    f"Review and approve at /admin/hub/enrolment/"
+                ),
+                from_email=settings.CONTACT_EMAIL,
+                recipient_list=[site.contact_email or settings.CONTACT_EMAIL],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
+        return redirect(f"{reverse('enrol')}?sent=1#enrol-form")
+
+    site = SiteSettings.get()
+    return render(request, "hub/enrol.html", {
+        "site": site,
+        "courses": Course.objects.filter(is_published=True),
+        "sent": request.GET.get("sent") == "1",
+    })
 
 
 @require_http_methods(["GET", "POST"])

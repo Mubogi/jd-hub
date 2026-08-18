@@ -256,3 +256,59 @@ class SiteSettings(models.Model):
     def get(cls) -> "SiteSettings":
         obj, _ = cls.objects.get_or_create(pk=1, defaults={})
         return obj
+
+
+class Enrolment(models.Model):
+    """A student enrolment request for the online academy / tutoring."""
+
+    LEVEL_CHOICES = [
+        ("nursery", "Nursery"),
+        ("p1_p3", "P1 – P3"),
+        ("p4_p6", "P4 – P6"),
+        ("p7", "P7"),
+        ("s1_s2", "S1 – S2"),
+        ("s3_s4", "S3 – S4 (O-Level)"),
+        ("s5_s6", "S5 – S6 (A-Level)"),
+        ("adult", "Adult Learner"),
+    ]
+
+    STATUS_CHOICES = [
+        ("pending", "Pending Payment"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+        ("completed", "Completed"),
+    ]
+
+    student_name = models.CharField(max_length=200)
+    email = models.EmailField()
+    phone = models.CharField(max_length=30)
+    course = models.ForeignKey(
+        Course, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="enrolments",
+        help_text="Optional — pick a course if relevant.",
+    )
+    subject = models.CharField(
+        max_length=200, blank=True,
+        help_text="Specific subject or topic (e.g. Mathematics, English, Prompt Engineering).",
+    )
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default="adult")
+    schedule = models.CharField(
+        max_length=255, blank=True,
+        help_text="Preferred day/time or 'flexible'.",
+    )
+    notes = models.TextField(blank=True, help_text="Anything the student wants us to know.")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    meet_link = models.URLField(
+        blank=True,
+        help_text="Google Meet link — set automatically when approved (once Google Meet is wired up).",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Enrolment"
+        verbose_name_plural = "Enrolments"
+
+    def __str__(self) -> str:
+        return f"{self.student_name} — {self.get_level_display()} ({self.created_at:%Y-%m-%d})"

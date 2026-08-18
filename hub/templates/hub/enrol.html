@@ -1,0 +1,132 @@
+{% extends "hub/base.html" %}
+{% load static %}
+
+{% block title %}Enrol for a Google Meet Class — Jordan Design Hub{% endblock %}
+
+{% block meta_description %}Enrol for a paid, instructor-led online class on Google Meet at Jordan Design Hub. Holiday tutoring (Nursery–S6), Scratch coding, graphic design, AI optimization, and adult courses. Book your slot today.{% endblock %}
+
+{% block content %}
+<section class="page-hero-jd">
+  <div class="container py-5 text-white">
+    <span class="badge bg-accent-soft text-accent mb-2 px-3 py-2 rounded-pill">Online Academy</span>
+    <h1 class="display-5 fw-extrabold mb-2">Enrol for a Google Meet class</h1>
+    <p class="lead text-white-50 mb-0">Fill the form, pay on WhatsApp, and we'll send your Meet link once approved.</p>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Form -->
+      <div class="col-lg-8" id="enrol-form">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+          <h2 class="h4 fw-bold mb-1">Student enrolment form</h2>
+          <p class="text-muted small mb-4">Fields marked with * are required. We'll reach out on WhatsApp to confirm payment and schedule.</p>
+
+          {% if sent %}
+          <div class="alert alert-success d-flex align-items-center" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <div>
+              <strong>Enrolment received!</strong> Next step: complete payment on WhatsApp
+              <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" class="alert-link">here</a>.
+              Once approved, your Google Meet link will be emailed to you.
+            </div>
+          </div>
+          {% endif %}
+
+          <form method="post" action="{% url 'enrol' %}#enrol-form" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+              <!-- Honeypot anti-spam -->
+              <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+                <label>Do not fill this field<input type="text" name="company_url" tabindex="-1" autocomplete="off"></label>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="id_student_name">Student name *</label>
+                <input type="text" class="form-control" id="id_student_name" name="student_name" required placeholder="Jane Doe">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="id_email">Email *</label>
+                <input type="email" class="form-control" id="id_email" name="email" required placeholder="jane@example.com">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="id_phone">Phone / WhatsApp *</label>
+                <input type="tel" class="form-control" id="id_phone" name="phone" required placeholder="+256 700 000 000">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="id_level">Education level *</label>
+                <select class="form-select" id="id_level" name="level" required>
+                  <option value="nursery">Nursery</option>
+                  <option value="p1_p3">P1 – P3</option>
+                  <option value="p4_p6">P4 – P6</option>
+                  <option value="p7">P7</option>
+                  <option value="s1_s2">S1 – S2</option>
+                  <option value="s3_s4">S3 – S4 (O-Level)</option>
+                  <option value="s5_s6">S5 – S6 (A-Level)</option>
+                  <option value="adult" selected>Adult Learner</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="id_course">Course (optional)</label>
+                <select class="form-select" id="id_course" name="course">
+                  <option value="">— General / Holiday tutoring —</option>
+                  {% for course in courses %}
+                  <option value="{{ course.pk }}">{{ course.title }}{% if course.level %} ({{ course.level }}){% endif %}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="id_subject">Specific subject</label>
+                <input type="text" class="form-control" id="id_subject" name="subject" placeholder="e.g. Mathematics, English, Prompt Engineering">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="id_schedule">Preferred schedule</label>
+                <input type="text" class="form-control" id="id_schedule" name="schedule" placeholder="e.g. Weekdays 4–6pm, Saturdays, or 'flexible'">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="id_notes">Notes (optional)</label>
+                <textarea class="form-control" id="id_notes" name="notes" rows="3" placeholder="Anything you'd like us to know — goals, topics to focus on, etc."></textarea>
+              </div>
+              <div class="col-12 d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-primary-jd rounded-pill px-4">
+                  <i class="fa-solid fa-paper-plane me-1"></i> Submit enrolment
+                </button>
+                <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" class="btn btn-success rounded-pill px-4">
+                  <i class="fa-brands fa-whatsapp me-1"></i> Pay on WhatsApp
+                </a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- How it works -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h3 class="h5 fw-bold mb-3"><i class="fa-solid fa-list-check text-primary me-2"></i>How it works</h3>
+          <ol class="ps-3 small mb-0">
+            <li class="mb-2"><strong>Fill the form</strong> — tell us the student, level, and course.</li>
+            <li class="mb-2"><strong>Pay on WhatsApp</strong> — we confirm your slot and fees.</li>
+            <li class="mb-2"><strong>Get approved</strong> — we email your Google Meet link.</li>
+            <li><strong>Join &amp; learn</strong> — attend your live class on Google Meet.</li>
+          </ol>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h3 class="h5 fw-bold mb-2"><i class="fa-solid fa-circle-info text-primary me-2"></i>Payment</h3>
+          <p class="small text-muted mb-2">Fees are confirmed per course on WhatsApp. Pay via MTN MoMo, Airtel Money, or as agreed.</p>
+          <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" class="btn btn-success rounded-pill btn-sm">
+            <i class="fa-brands fa-whatsapp me-1"></i> Confirm fees on WhatsApp
+          </a>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <h3 class="h5 fw-bold mb-2"><i class="fa-solid fa-headset text-primary me-2"></i>Need help?</h3>
+          <p class="small text-muted mb-2">Questions before enrolling? Reach us directly.</p>
+          <a href="mailto:{{ CONTACT_EMAIL }}" class="btn btn-outline-primary-jd rounded-pill btn-sm">
+            <i class="fa-solid fa-envelope me-1"></i> Email us
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

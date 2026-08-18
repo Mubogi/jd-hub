@@ -17,6 +17,7 @@ from hub.sitemaps import sitemaps
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.home, name="home"),
+    path("enrol/", views.enrol, name="enrol"),
     path("contact/", views.contact, name="contact"),
     path("systems/<slug:slug>/pdf/", views.system_pdf, name="system_pdf"),
     path("robots.txt", views.robots, name="robots"),

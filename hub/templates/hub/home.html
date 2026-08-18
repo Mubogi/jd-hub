@@ -21,8 +21,8 @@
           <a href="#systems" class="btn btn-accent btn-lg rounded-pill px-4">
             <i class="fa-solid fa-cube me-1"></i> Explore Systems
           </a>
-          <a href="#academy" class="btn btn-outline-light btn-lg rounded-pill px-4">
-            <i class="fa-solid fa-graduation-cap me-1"></i> Join Academy
+          <a href="{% url 'enrol' %}" class="btn btn-outline-light btn-lg rounded-pill px-4">
+            <i class="fa-solid fa-graduation-cap me-1"></i> Enrol for a Class
           </a>
         </div>
         <div class="hero-stats mt-5 d-flex flex-wrap gap-4">
@@ -132,7 +132,7 @@
         <div class="how-step text-center">
           <span class="how-num">1</span>
           <h3 class="h6 fw-bold mb-1">Enrol &amp; Pay</h3>
-          <p class="small text-muted mb-0">Choose a course and email us to book your slot.</p>
+          <p class="small text-muted mb-0">Fill the enrolment form, then pay on WhatsApp to confirm your slot.</p>
         </div>
       </div>
       <div class="col-md-4">
@@ -182,8 +182,8 @@
             {% endif %}
           </div>
           <div class="card-footer bg-transparent border-0 p-4 pt-0">
-            <a href="{% url 'contact' %}?subject=Academy: {{ course.title }}" class="btn btn-sm btn-outline-primary-jd rounded-pill w-100">
-              Enquire / Enrol <i class="fa-solid fa-arrow-right ms-1"></i>
+            <a href="{% url 'enrol' %}" class="btn btn-sm btn-outline-primary-jd rounded-pill w-100">
+              Enrol <i class="fa-solid fa-arrow-right ms-1"></i>
             </a>
           </div>
         </article>
@@ -193,6 +193,11 @@
       {% endfor %}
     </div>
     <p class="text-center text-muted small mt-3" id="courseEmpty" style="display:none;">No courses in this category.</p>
+    <div class="text-center mt-4">
+      <a href="{% url 'enrol' %}" class="btn btn-primary-jd btn-lg rounded-pill px-4">
+        <i class="fa-solid fa-graduation-cap me-1"></i> Enrol for a Google Meet class
+      </a>
+    </div>
   </div>
 </section>
 
