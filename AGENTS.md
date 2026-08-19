@@ -40,12 +40,30 @@ Red + gold brand theme. Deployed on Render free tier.
 - `/tmp/attend-android` — Kotlin Android app (no APK/screenshots in repo)
 - Screenshots captured from these are stored in `media/system_shots/`
 
+## Marketing Kit (scripts/gen_marketing_kit.py)
+- Generates 90 posters (30 products × 3 formats: square/story/landscape) → `marketing/`
+- **v2 design**: real stock photos (Pexels CC0) of people on each poster, gradient
+  masks, glassmorphism, mesh gradients, noise texture, glow effects
+- Photo mapping: `scripts/_marketing_photos.py` (PRODUCT_PHOTOS dict, 23 curated IDs)
+- Photos cached in `marketing/_assets/pexels_<id>.jpg` (downloaded once)
+- Posters downscaled to 1x (1080px) — chromium renders at 2x retina, Pillow downscales
+- **Promo video**: vertical 1080×1920 (TikTok-native), AI voiceover via edge-tts
+  (en-US-AndrewMultilingualNeural), synthesized music bed (C-Am-G-F chords),
+  Ken Burns zoom + xfade transitions, ~40s, H.264+AAC
+- **Brochure**: single PDF from JPEG-converted posters (~6MB, under GitHub 100MB limit)
+- Run: `python scripts/gen_marketing_kit.py` (all) or `--posters`/`--video`/`--pdf`
+- Chromium flags MUST use `--flag=value` syntax (not space-separated)
+- ffmpeg music bed: use `sine` sources not `aevalsrc` (TAU/PI constants unsupported),
+  output WAV (AAC encoder chokes on tiny amix buffers)
+- edge-tts: use Python API (`asyncio.run`), CLI not available
+
 ## Completed Work
 - Google Search Console verified; Google Meet integration (commit bc9c56c)
 - MoMo/Airtel payment prompts on enrolment success + email
 - Real screenshots embedded in system PDFs (SMS + Attendance Hub)
 - 4 systems, 12 courses (incl. 6 Microsoft Office: Word/Excel/PowerPoint/Access/Word+Excel combo/Full Suite)
 - 48 lesson PDFs (12 courses × 4 tracks), 14 marketing images, 10 gallery items
+- Marketing kit v2: illustrated posters + TikTok video with AI voiceover (commit 4aa5c07)
 
 ## Brand Colours
 - Red: #C8102E (primary), #8B0000 (dark)
