@@ -311,20 +311,54 @@ def _icon_svg(icon_class: str, accent: str) -> str:
     )
 
 
+def _photo_for_spec(spec: PosterSpec) -> Path | None:
+    """Return local path to the hero photo for a spec, or None."""
+    from scripts._marketing_photos import PRODUCT_PHOTOS, FALLBACK_PHOTO
+    pid = PRODUCT_PHOTOS.get(spec.key) or FALLBACK_PHOTO
+    p = OUT / "_assets" / f"pexels_{pid}.jpg"
+    return p if p.exists() else None
+
+
 def render_html(spec: PosterSpec, fmt: str, w: int, h: int) -> str:
     is_story = fmt == "story"
     is_landscape = fmt == "landscape"
     accent = spec.accent
 
-    if is_landscape:
-        layout = "landscape-layout"
-    elif is_story:
-        layout = "story-layout"
-    else:
-        layout = "square-layout"
+    layout = "story-layout" if is_story else ("landscape-layout" if is_landscape else "square-layout")
 
     bullets_html = _bullet_list(spec.bullets, accent)
     icon_svg = _icon_svg(spec.icon, accent)
+
+    # Hero photo (embed as data URI so HTML is self-contained for chromium)
+    photo_path = _photo_for_spec(spec)
+    photo_uri = ""
+    if photo_path:
+        import base64
+        with open(photo_path, "rb") as f:
+            photo_uri = "data:image/jpeg;base64," + base64.b64encode(f.read()).decode()
+
+    # Layout-specific photo geometry (position + gradient mask direction)
+    if is_story:
+        # full-bleed photo on top ~55%, content card on bottom
+        photo_block = f"""
+        <div class="hero" style="background-image:url('{photo_uri}')"></div>
+        <div class="hero-mask"></div>
+        <div class="hero-glow"></div>"""
+        content_class = "content content-bottom"
+    elif is_landscape:
+        # photo on right ~42%, content on left
+        photo_block = f"""
+        <div class="hero hero-right" style="background-image:url('{photo_uri}')"></div>
+        <div class="hero-mask hero-mask-right"></div>
+        <div class="hero-glow hero-glow-right"></div>"""
+        content_class = "content content-left"
+    else:
+        # square: photo on right ~45%, content on left
+        photo_block = f"""
+        <div class="hero hero-right" style="background-image:url('{photo_uri}')"></div>
+        <div class="hero-mask hero-mask-right"></div>
+        <div class="hero-glow hero-glow-right"></div>"""
+        content_class = "content content-left"
 
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
@@ -340,113 +374,164 @@ def render_html(spec: PosterSpec, fmt: str, w: int, h: int) -> str:
     font-family:'Noto Sans','DejaVu Sans',sans-serif;
     color:var(--cream);
     background:
-      radial-gradient(120% 80% at 85% 12%, rgba(212,175,55,.16), transparent 55%),
-      radial-gradient(110% 70% at 8% 92%, rgba(200,16,46,.20), transparent 55%),
-      linear-gradient(150deg,#15060a 0%,#2a0a14 40%,#1A1A2E 100%);
+      radial-gradient(120% 80% at 12% 8%, rgba(212,175,55,.20), transparent 50%),
+      radial-gradient(110% 70% at 8% 95%, rgba(200,16,46,.24), transparent 50%),
+      radial-gradient(90% 60% at 95% 50%, rgba(139,0,0,.30), transparent 55%),
+      linear-gradient(150deg,#120409 0%,#2a0a14 42%,#161628 100%);
     position:relative;
   }}
-  /* decorative gold rings */
-  body::before, body::after {{
-    content:""; position:absolute; border-radius:50%; border:2px solid rgba(212,175,55,.18);
-    pointer-events:none;
+  /* grain/noise overlay for depth */
+  body::before {{
+    content:""; position:absolute; inset:0; z-index:5; pointer-events:none;
+    opacity:.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }}
-  body::before {{ width:{int(w*0.62)}px; height:{int(w*0.62)}px; right:-{int(w*0.18)}px; top:-{int(w*0.18)}px; }}
-  body::after  {{ width:{int(w*0.40)}px; height:{int(w*0.40)}px; left:-{int(w*0.12)}px; bottom:-{int(w*0.12)}px; border-color:rgba(200,16,46,.16); }}
+  /* decorative gold rings (behind content) */
+  body::after {{
+    content:""; position:absolute; border-radius:50%;
+    border:1.5px solid rgba(212,175,55,.16); pointer-events:none; z-index:1;
+    width:{int(w*0.55)}px; height:{int(w*0.55)}px; right:-{int(w*0.16)}px; top:-{int(w*0.16)}px;
+  }}
 
-  .wrap {{ position:relative; z-index:2; width:100%; height:100%; display:flex; flex-direction:column;
-          padding:{int(w*0.075)}px {int(w*0.075)}px; }}
-  .top {{ display:flex; align-items:center; gap:{int(w*0.028)}px; }}
-  .logo {{ width:{int(w*0.085)}px; height:{int(w*0.085)}px; flex:0 0 auto; }}
+  /* ---------- hero photo ---------- */
+  .hero {{
+    position:absolute; z-index:2; background-size:cover; background-position:center;
+    background-repeat:no-repeat;
+  }}
+  .hero-right {{ top:0; right:0; bottom:0; width:{int(w*0.46)}px;
+    border-left:1.5px solid rgba(212,175,55,.25); }}
+  /* full-bleed top hero for story */
+  .story-layout .hero {{ top:0; left:0; right:0; height:{int(h*0.54)}px; width:auto; border:0; }}
+  /* gradient mask: blends photo into dark bg on the inner edge */
+  .hero-mask {{
+    position:absolute; z-index:3; pointer-events:none;
+    /* default: mask the LEFT edge of a right-placed hero */
+    top:0; right:0; bottom:0; width:{int(w*0.46)}px;
+    background:linear-gradient(90deg, #16070d 0%, rgba(22,7,13,.85) 12%, rgba(22,7,13,.30) 45%, transparent 100%);
+  }}
+  .hero-mask-right {{ /* same as default; kept for clarity */ }}
+  .story-layout .hero-mask {{
+    top:0; left:0; right:0; height:{int(h*0.54)}px; width:auto;
+    background:linear-gradient(180deg, transparent 40%, rgba(22,7,13,.55) 70%, #16070d 100%);
+  }}
+  /* colored glow sitting on the photo for richness */
+  .hero-glow {{
+    position:absolute; z-index:3; pointer-events:none; border-radius:50%;
+    width:{int(w*0.30)}px; height:{int(w*0.30)}px; right:{int(w*0.06)}px; top:{int(w*0.06)}px;
+    background:radial-gradient(circle, rgba(212,175,55,.30), transparent 70%);
+    mix-blend-mode:screen;
+  }}
+  .hero-glow-right {{ }}
+  .story-layout .hero-glow {{ right:{int(w*0.05)}px; top:{int(h*0.08)}px; width:{int(w*0.26)}px; height:{int(w*0.26)}px; }}
+
+  /* ---------- content ---------- */
+  .content {{
+    position:absolute; z-index:6;
+    display:flex; flex-direction:column;
+    padding:{int(w*0.07)}px;
+  }}
+  .content-left {{ top:0; left:0; bottom:0; width:{int(w*0.54)}px; }}
+  .content-bottom {{ top:{int(h*0.40)}px; left:0; right:0; bottom:0; width:100%; }}
+
+  .top {{ display:flex; align-items:center; gap:{int(w*0.026)}px; }}
+  .logo {{ width:{int(w*0.075)}px; height:{int(w*0.075)}px; flex:0 0 auto; }}
   .brand {{ display:flex; flex-direction:column; line-height:1.1; }}
-  .brand b {{ font-size:{int(w*0.034)}px; font-weight:800; color:var(--gold); letter-spacing:.5px; }}
-  .brand small {{ font-size:{int(w*0.020)}px; color:rgba(251,247,240,.55); letter-spacing:2px; text-transform:uppercase; }}
+  .brand b {{ font-size:{int(w*0.030)}px; font-weight:800; color:var(--gold); letter-spacing:.5px; }}
+  .brand small {{ font-size:{int(w*0.018)}px; color:rgba(251,247,240,.55); letter-spacing:2px; text-transform:uppercase; }}
 
   .eyebrow {{
-    margin-top:{int(w*0.05)}px; display:inline-block; align-self:flex-start;
-    font-size:{int(w*0.022)}px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
-    color:var(--ink); background:{accent}; padding:{int(w*0.012)}px {int(w*0.028)}px; border-radius:999px;
+    margin-top:{int(w*0.045)}px; display:inline-block; align-self:flex-start;
+    font-size:{int(w*0.020)}px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+    color:var(--ink); background:linear-gradient(90deg,{accent},{GOLD}); padding:{int(w*0.011)}px {int(w*0.026)}px; border-radius:999px;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);
   }}
   .icon-badge {{
-    margin-top:{int(w*0.04)}px; width:{int(w*0.13)}px; height:{int(w*0.13)}px; border-radius:50%;
+    margin-top:{int(w*0.035)}px; width:{int(w*0.115)}px; height:{int(w*0.115)}px; border-radius:50%;
     background:linear-gradient(135deg,{accent},{RED_DARK});
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 10px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(212,175,55,.3) inset;
+    box-shadow:0 14px 44px rgba(0,0,0,.5), 0 0 0 1.5px rgba(212,175,55,.35) inset, 0 0 30px {accent}55;
   }}
-  .icon-badge svg {{ width:60%; height:60%; }}
+  .icon-badge svg {{ width:58%; height:58%; }}
   .title {{
-    margin-top:{int(w*0.028)}px; font-weight:900; line-height:1.02;
-    font-size:{int(w*0.082)}px; color:#fff;
-    text-shadow:0 4px 30px rgba(0,0,0,.45);
+    margin-top:{int(w*0.026)}px; font-weight:900; line-height:1.0;
+    font-size:{int(w*0.076)}px; color:#fff;
+    text-shadow:0 6px 30px rgba(0,0,0,.55);
   }}
   .title .accent {{ color:var(--gold); }}
   .tagline {{
-    margin-top:{int(w*0.028)}px; font-size:{int(w*0.030)}px; line-height:1.35;
-    color:rgba(251,247,240,.82); font-weight:500; max-width:{int(w*0.78)}px;
+    margin-top:{int(w*0.026)}px; font-size:{int(w*0.027)}px; line-height:1.35;
+    color:rgba(251,247,240,.85); font-weight:500; max-width:{int(w*0.74)}px;
   }}
 
-  .bullets {{ margin-top:{int(w*0.045)}px; list-style:none; display:flex; flex-direction:column;
-             gap:{int(w*0.018)}px; max-width:{int(w*0.80)}px; }}
-  .bullets li {{ display:flex; align-items:flex-start; gap:{int(w*0.022)}px; font-size:{int(w*0.026)}px;
-                line-height:1.3; color:rgba(251,247,240,.9); }}
-  .dot {{ flex:0 0 auto; width:{int(w*0.016)}px; height:{int(w*0.016)}px; border-radius:50%;
-          margin-top:{int(w*0.010)}px; box-shadow:0 0 12px {accent}; }}
+  .bullets {{ margin-top:{int(w*0.040)}px; list-style:none; display:flex; flex-direction:column;
+             gap:{int(w*0.016)}px; max-width:{int(w*0.74)}px; }}
+  .bullets li {{ display:flex; align-items:flex-start; gap:{int(w*0.020)}px; font-size:{int(w*0.023)}px;
+                line-height:1.3; color:rgba(251,247,240,.92); }}
+  .dot {{ flex:0 0 auto; width:{int(w*0.014)}px; height:{int(w*0.014)}px; border-radius:50%;
+          margin-top:{int(w*0.009)}px; box-shadow:0 0 14px {accent}; }}
 
   .spacer {{ flex:1; }}
 
-  .cta-row {{ display:flex; align-items:center; gap:{int(w*0.022)}px; }}
+  .cta-row {{ display:flex; align-items:center; gap:{int(w*0.020)}px; }}
   .cta {{
-    display:inline-flex; align-items:center; gap:{int(w*0.020)}px;
+    display:inline-flex; align-items:center; gap:{int(w*0.018)}px;
     background:linear-gradient(135deg,{accent},{RED_DARK});
-    color:#fff; font-weight:800; font-size:{int(w*0.030)}px; letter-spacing:.5px;
-    padding:{int(w*0.020)}px {int(w*0.040)}px; border-radius:999px;
-    box-shadow:0 10px 30px rgba(0,0,0,.4); border:1px solid rgba(212,175,55,.4);
+    color:#fff; font-weight:800; font-size:{int(w*0.027)}px; letter-spacing:.5px;
+    padding:{int(w*0.018)}px {int(w*0.036)}px; border-radius:999px;
+    box-shadow:0 12px 32px rgba(0,0,0,.45), 0 0 0 1px rgba(212,175,55,.45) inset;
   }}
-  .cta svg {{ width:{int(w*0.026)}px; height:{int(w*0.026)}px; fill:#fff; }}
+  .cta svg {{ width:{int(w*0.024)}px; height:{int(w*0.024)}px; fill:#fff; }}
 
   .contact {{
-    margin-top:{int(w*0.028)}px; display:flex; flex-direction:column; gap:2px;
-    font-size:{int(w*0.020)}px; color:rgba(251,247,240,.6);
+    margin-top:{int(w*0.026)}px; display:flex; flex-direction:column; gap:2px;
+    font-size:{int(w*0.018)}px; color:rgba(251,247,240,.62);
   }}
   .contact b {{ color:var(--gold); }}
 
   .footer-bar {{
-    margin-top:{int(w*0.03)}px; height:{int(w*0.006)}px; width:100%;
+    margin-top:{int(w*0.026)}px; height:{int(w*0.005)}px; width:100%;
     background:linear-gradient(90deg,{accent},var(--gold),transparent); border-radius:999px;
   }}
-  .note {{ margin-top:{int(w*0.014)}px; font-size:{int(w*0.018)}px; color:rgba(251,247,240,.4); }}
+  .note {{ margin-top:{int(w*0.012)}px; font-size:{int(w*0.016)}px; color:rgba(251,247,240,.42); }}
 
-  /* story layout: stack vertically with more breathing room */
-  .story-layout .title {{ font-size:{int(w*0.094)}px; }}
-  /* landscape: two columns on wide canvas */
-  .landscape-layout .title {{ font-size:{int(w*0.060)}px; }}
-  .landscape-layout .tagline {{ font-size:{int(w*0.024)}px; }}
-  .landscape-layout .bullets li {{ font-size:{int(w*0.020)}px; }}
+  /* ---------- format tweaks ---------- */
+  .story-layout .title {{ font-size:{int(w*0.088)}px; }}
+  .story-layout .content-bottom {{ padding-top:{int(w*0.02)}px; }}
+  .landscape-layout .title {{ font-size:{int(w*0.056)}px; }}
+  .landscape-layout .tagline {{ font-size:{int(w*0.022)}px; }}
+  .landscape-layout .bullets li {{ font-size:{int(w*0.019)}px; }}
+  .landscape-layout .hero-right {{ width:{int(w*0.42)}px; }}
+  .landscape-layout .hero-mask {{ width:{int(w*0.42)}px; }}
+  .landscape-layout .content-left {{ width:{int(w*0.58)}px; padding:{int(h*0.10)}px {int(w*0.05)}px; }}
 </style></head>
 <body>
   <div class="wrap {layout}">
-    <div class="top">
-      <div class="logo">{_LOGO_SVG}</div>
-      <div class="brand"><b>Jordan Design Hub</b><small>Apps · Academy · Media · AI</small></div>
+    {photo_block}
+    <div class="{content_class}">
+      <div class="top">
+        <div class="logo">{_LOGO_SVG}</div>
+        <div class="brand"><b>Jordan Design Hub</b><small>Apps · Academy · Media · AI</small></div>
+      </div>
+
+      <span class="eyebrow">{escape(spec.eyebrow)}</span>
+      <div class="icon-badge">{icon_svg}</div>
+      <h1 class="title">{escape(spec.title)}</h1>
+      <p class="tagline">{escape(spec.tagline)}</p>
+
+      {bullets_html}
+
+      <div class="spacer"></div>
+
+      <div class="cta-row">
+        <span class="cta"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg> {escape(spec.cta)}</span>
+      </div>
+      <div class="contact">
+        <div><b>WhatsApp:</b> +256 754 687 597</div>
+        <div><b>Email:</b> jordandesignhub@gmail.com</div>
+      </div>
+      <div class="footer-bar"></div>
+      {'<div class="note">'+escape(spec.footer_note)+'</div>' if spec.footer_note else ''}
     </div>
-
-    <span class="eyebrow">{escape(spec.eyebrow)}</span>
-    <div class="icon-badge">{icon_svg}</div>
-    <h1 class="title">{escape(spec.title)}</h1>
-    <p class="tagline">{escape(spec.tagline)}</p>
-
-    {bullets_html}
-
-    <div class="spacer"></div>
-
-    <div class="cta-row">
-      <span class="cta"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg> {escape(spec.cta)}</span>
-    </div>
-    <div class="contact">
-      <div><b>WhatsApp:</b> +256 754 687 597</div>
-      <div><b>Email:</b> jordandesignhub@gmail.com</div>
-    </div>
-    <div class="footer-bar"></div>
-    {'<div class="note">'+escape(spec.footer_note)+'</div>' if spec.footer_note else ''}
   </div>
 </body></html>"""
 
@@ -509,43 +594,161 @@ def render_poster(spec: PosterSpec, fmt: str) -> list[Path]:
 # Combined brochure PDF
 # ---------------------------------------------------------------------------
 def build_brochure(all_pngs: list[Path]) -> Path:
-    """Stitch all poster PNGs (sorted) into a single PDF brochure."""
+    """Stitch all poster PNGs (sorted) into a single PDF brochure.
+    Posters are converted to JPEG (quality 82) first to keep the brochure
+    well under GitHub's 100MB file-size limit — PNGs of photo-rich posters
+    are 5-10x larger than equivalent JPEGs."""
     import img2pdf
+    from PIL import Image
 
     out = OUT / "JD-Hub-Marketing-Brochure.pdf"
-    ordered = sorted(p for p in all_pngs if p.name.endswith("-square.png") or p.name.endswith("-landscape.png"))
+    ordered = sorted(
+        p for p in all_pngs
+        if p.name.endswith("-square.png") or p.name.endswith("-landscape.png")
+    )
     if not ordered:
         ordered = sorted(all_pngs)
+
+    # Convert each PNG to a JPEG in a temp dir (img2pdf handles JPGs far better).
+    jpg_dir = TMP / "brochure_jpgs"
+    if jpg_dir.exists():
+        shutil.rmtree(jpg_dir)
+    jpg_dir.mkdir(parents=True)
+    jpg_paths = []
+    for p in ordered:
+        jpg = jpg_dir / (p.stem + ".jpg")
+        Image.open(p).convert("RGB").save(jpg, "JPEG", quality=82, optimize=True)
+        jpg_paths.append(jpg)
+
     with open(out, "wb") as f:
-        f.write(img2pdf.convert([str(p) for p in ordered]))
+        f.write(img2pdf.convert([str(p) for p in jpg_paths]))
     return out
 
 
 # ---------------------------------------------------------------------------
-# Marketing video (MP4) via ffmpeg
+# Marketing narration script + AI voiceover (edge-tts)
+# ---------------------------------------------------------------------------
+NARRATION = (
+    "Meet Jordan Design Hub — Uganda's all-in-one tech ecosystem. "
+    "We build custom web and mobile apps that work even offline. "
+    "We run a paid online academy — coding, STEM, Microsoft Office, and AI. "
+    "We design graphics, train church media teams, and tutor your kids every holiday. "
+    "From school management systems to SACCO microfinance software, "
+    "we build the tools that move your mission forward. "
+    "Red and gold. Bold by design. "
+    "Enrol, book a demo, or get a quote today. "
+    "WhatsApp plus two five six seven five four six eight seven five nine seven. "
+    "Jordan Design Hub — build, learn, and grow."
+)
+
+
+def _generate_voiceover(out_path: Path) -> float:
+    """Generate an AI voiceover MP3 via edge-tts. Returns duration in seconds."""
+    import asyncio
+    import edge_tts
+
+    async def _go():
+        # "en-US-AndrewMultilingualNeural" is a warm, energetic male voice
+        # that suits marketing. Fall back to Aria (female) if it errors.
+        try:
+            comm = edge_tts.Communicate(NARRATION, "en-US-AndrewMultilingualNeural",
+                                        rate="+6%", pitch="+0Hz")
+        except Exception:
+            comm = edge_tts.Communicate(NARRATION, "en-US-AriaNeural")
+        await comm.save(str(out_path))
+
+    asyncio.run(_go())
+    # probe duration via ffmpeg
+    r = subprocess.run(
+        [FFMPEG, "-i", str(out_path)],
+        capture_output=True, text=True,
+    )
+    for line in r.stderr.splitlines():
+        if "Duration" in line:
+            parts = line.split("Duration:")[1].split(",")[0].strip().split(":")
+            return float(parts[0]) * 3600 + float(parts[1]) * 60 + float(parts[2])
+    return 35.0  # fallback guess
+
+
+def _generate_music_bed(out_path: Path, duration: float) -> None:
+    """Synthesize a subtle, modern ambient music bed with ffmpeg.
+    A soft pulsing chord pad underneath the voiceover — gives the video
+    'sound' without licensing risk. Kept low so the voice stays clear.
+
+    Uses layered sine sources (avoids aevalsrc constant issues) and outputs
+    WAV since the AAC encoder chokes on tiny amix buffers."""
+    # Build a 4-chord progression (C - Am - G - F), each a triad of sines,
+    # plus a soft sub-bass pulse for rhythm. Each chord lasts `seg` seconds.
+    chords = [
+        (261.63, 329.63, 392.00),  # C
+        (220.00, 261.63, 329.63),  # Am
+        (196.00, 246.94, 293.66),  # G
+        (174.61, 220.00, 261.63),  # F
+    ]
+    seg = max(duration / len(chords), 1.0)
+    inputs = []
+    for f1, f2, f3 in chords:
+        # 3 sine tones per chord, each `seg` seconds
+        inputs += ["-f", "lavfi", "-t", f"{seg:.2f}", "-i", f"sine=frequency={f1}:duration={seg:.2f}"]
+        inputs += ["-f", "lavfi", "-t", f"{seg:.2f}", "-i", f"sine=frequency={f2}:duration={seg:.2f}"]
+        inputs += ["-f", "lavfi", "-t", f"{seg:.2f}", "-i", f"sine=frequency={f3}:duration={seg:.2f}"]
+    # sub-bass pulse for rhythm (whole duration)
+    inputs += ["-f", "lavfi", "-t", f"{duration:.2f}", "-i",
+               f"sine=frequency=58:duration={duration:.2f}"]
+    # mix: 4 chords (each 3 sines) concat, then mix with bass + process
+    n_tones = len(chords) * 3  # 12 tone inputs
+    # chord assembly: each chord = amix of its 3 sines -> [c0]..[c3]
+    chord_mix = []
+    for ci in range(len(chords)):
+        base = ci * 3
+        chord_mix.append(
+            f"[{base}:a][{base+1}:a][{base+2}:a]amix=inputs=3:duration=longest:weights=0.16 0.12 0.11[c{ci}]"
+        )
+    # concat the 4 chords
+    concat_inputs = "".join(f"[c{ci}]" for ci in range(len(chords)))
+    chain = (
+        ";".join(chord_mix) + ";"
+        + f"{concat_inputs}concat=n={len(chords)}:v=0:a=1[ac];"
+        + f"[ac][{n_tones}:a]amix=inputs=2:duration=longest:weights=1 0.4[mix];"
+        + "[mix]volume=0.6,lowpass=f=1400,"
+        + f"afade=t=in:st=0:d=1.5,afade=t=out:st={max(duration-2.5,0.1):.2f}:d=2"
+    )
+    cmd = [FFMPEG, "-y"] + inputs + [
+        "-filter_complex", chain,
+        "-c:a", "pcm_s16le",  # WAV intermediate — AAC chokes here
+        str(out_path),
+    ]
+    subprocess.run(cmd, check=True, capture_output=True, timeout=300)
+
+
+# ---------------------------------------------------------------------------
+# Marketing video (MP4) via ffmpeg — vertical TikTok format with AI voiceover
 # ---------------------------------------------------------------------------
 def build_video(all_pngs: list[Path]) -> Path | None:
+    """Build a polished vertical (1080x1920) marketing video:
+    Ken Burns zoom on each poster, crossfades, AI voiceover + music bed."""
     if not FFMPEG:
         print("  ! ffmpeg not found, skipping video")
         return None
-    # pick a strong curated set: brand + group posters + a few product squares
-    curated: list[Path] = []
-    brand_sq = OUT / "brand" / "group-brand-square.png"
-    groups = sorted((OUT / "groups").glob("group-*-square.png"))
-    systems = sorted((OUT / "systems").glob("system-*-square.png"))
-    courses = sorted((OUT / "courses").glob("course-*-square.png"))
-    services = sorted((OUT / "services").glob("service-*-square.png"))
 
-    if brand_sq.exists():
-        curated.append(brand_sq)
+    # Curate frames: brand + groups + a few products, using STORY format
+    # (1080x1920) since the video is vertical.
+    curated: list[Path] = []
+    brand = OUT / "brand" / "group-brand-story.png"
+    groups = sorted((OUT / "groups").glob("group-*-story.png"))
+    systems = sorted((OUT / "systems").glob("system-*-story.png"))
+    courses = sorted((OUT / "courses").glob("course-*-story.png"))
+    services = sorted((OUT / "services").glob("service-*-story.png"))
+
+    if brand.exists():
+        curated.append(brand)
     curated.extend(groups)
-    curated.extend(systems[:4])
+    curated.extend(systems[:3])
     curated.extend([c for c in courses if "microsoft" in c.name][:3])
-    curated.extend(services[:3])
-    # de-duplicate preserve order
+    curated.extend(services[:2])
+    # de-dup, preserve order
     seen = set()
     curated = [p for p in curated if not (p in seen or seen.add(p))]
-
     if not curated:
         print("  ! no poster PNGs found for video")
         return None
@@ -555,46 +758,82 @@ def build_video(all_pngs: list[Path]) -> Path | None:
         shutil.rmtree(frames_dir)
     frames_dir.mkdir(parents=True)
 
-    # Pre-resize all frames to 1080x1080 so the concat is uniform.
     from PIL import Image
 
     for i, p in enumerate(curated, 1):
         im = Image.open(p).convert("RGB")
-        im = im.resize((1080, 1080), Image.LANCZOS)
+        im = im.resize((1080, 1920), Image.LANCZOS)
         im.save(frames_dir / f"frame_{i:03d}.png")
-
     n = len(curated)
-    # Build a slideshow: each image shown 2.5s with a slow zoom-in (zoompan),
-    # crossfades between images via xfade. We assemble using a concat demuxer
-    # for simplicity + a fade filter per segment for a polished feel.
-    seg_dur = 2.5
-    frames_dir_abs = str(frames_dir.resolve())
-    list_file = TMP / "frames.txt"
-    with open(list_file, "w") as f:
-        for i in range(1, n + 1):
-            f.write(f"file '{frames_dir_abs}/frame_{i:03d}.png'\n")
-            f.write(f"duration {seg_dur}\n")
-        # repeat last frame per ffmpeg concat requirement
-        f.write(f"file '{frames_dir_abs}/frame_{n:03d}.png'\n")
 
+    # Generate voiceover + music bed first so we can time the video to the audio.
+    print("    generating AI voiceover ...")
+    voice = TMP / "voice.mp3"
+    voice_dur = _generate_voiceover(voice)
+    print(f"    voiceover: {voice_dur:.1f}s")
+    music = TMP / "music.wav"
+    print("    generating music bed ...")
+    _generate_music_bed(music, voice_dur + 2.0)
+
+    # Each poster on screen: voice_dur / n, with crossfades.
+    seg = max(voice_dur / n, 1.8)
+    fade = min(seg * 0.4, 0.7)
+
+    # Build the visual stream: concat with per-segment zoom (zoompan) + xfade.
+    # Approach: render each frame to its own 1080x1920 clip with a slow zoom-in,
+    # then crossfade them together with xfade.
+    clips = []
+    for i in range(1, n + 1):
+        clip = TMP / f"clip_{i:03d}.mp4"
+        # zoompan: start zoom 1.0 → 1.10 over the segment for life.
+        zframes = int(seg * 30)
+        cmd = [
+            FFMPEG, "-y", "-loop", "1", "-i", str(frames_dir / f"frame_{i:03d}.png"),
+            "-vf",
+            f"scale=2400:4260:force_original_aspect_ratio=increase,crop=2160:3840,"
+            f"zoompan=z='min(zoom+0.0008,1.12)':d={zframes}:s=1080x1920:fps=30,"
+            f"format=yuv420p",
+            "-c:v", "libx264", "-preset", "fast", "-crf", "22",
+            "-t", f"{seg + fade}", "-pix_fmt", "yuv420p",
+            str(clip),
+        ]
+        subprocess.run(cmd, check=True, capture_output=True, timeout=300)
+        clips.append(clip)
+
+    # Crossfade clips together into one visual track.
+    # xfade chain: [0:v][1:v]xfade->x0; [x0][2:v]xfade->x1; ...
+    vis = TMP / "visual.mp4"
+    fc = ["-i", str(clips[0])]
+    for c in clips[1:]:
+        fc += ["-i", str(c)]
+    n_inputs = len(clips)
+    xf = []
+    cum = 0.0
+    for i in range(1, n_inputs):
+        cum += seg
+        # input label: first iteration uses [0:v], later use [x{i-1}]
+        in_a = "[0:v]" if i == 1 else f"[x{i-1}]"
+        out = "[vout]" if i == n_inputs - 1 else f"[x{i}]"
+        xf.append(
+            f"{in_a}[{i}:v]xfade=transition=fade:duration={fade}:offset={cum - fade}{out}"
+        )
+    fc += ["-filter_complex", ";".join(xf), "-map", "[vout]",
+           "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+           "-pix_fmt", "yuv420p", "-r", "30", str(vis)]
+    subprocess.run([FFMPEG] + fc, check=True, capture_output=True, timeout=600)
+
+    # Mux visual + (voiceover + music) audio.
     out = OUT / "JD-Hub-Promo.mp4"
-    # Two-pass approach for reliability:
-    #  1) concat images (uniform size) into an intermediate mp4 with xfade-free
-    #     cuts — clean and robust.
-    #  2) We keep it single-pass here; zoompan is applied per-input below via
-    #     a simpler scale+fade pipeline to avoid the concat+zoompan complexity.
-    cmd = [
-        FFMPEG, "-y", "-safe", "0",
-        "-f", "concat", "-i", str(list_file.resolve()),
-        "-vf",
-        "scale=1080:1080:force_original_aspect_ratio=decrease,"
-        "pad=1080:1080:-1:-1:color=black,format=yuv420p,"
-        "fade=t=in:st=0:d=0.5,fade=t=out:st=" + str(seg_dur * n - 0.5) + ":d=0.5",
-        "-c:v", "libx264", "-preset", "medium", "-crf", "20",
-        "-pix_fmt", "yuv420p", "-movflags", "+faststart",
+    mux = [
+        FFMPEG, "-y", "-i", str(vis), "-i", str(voice), "-i", str(music),
+        "-filter_complex",
+        "[1:a]volume=1.0[voice];[2:a]volume=0.85[mus];[voice][mus]amix=inputs=2:duration=longest:dropout_transition=0[a]",
+        "-map", "0:v", "-map", "[a]",
+        "-c:v", "copy", "-c:a", "aac", "-b:a", "160k",
+        "-shortest", "-movflags", "+faststart",
         str(out),
     ]
-    subprocess.run(cmd, check=True, capture_output=True, timeout=600)
+    subprocess.run(mux, check=True, capture_output=True, timeout=600)
     return out
 
 
